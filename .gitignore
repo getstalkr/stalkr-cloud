@@ -1,5 +1,5 @@
 
-# Created by https://www.gitignore.io/api/git,macos,linux,swift,xcode,windows,swiftpm,swiftpackagemanager
+# Created by https://www.gitignore.io/api/git,macos,linux,swift,xcode,windows,swiftpm,swiftpackagemanager,vapor
 
 ### Git ###
 *.orig
@@ -123,6 +123,11 @@ xcuserdata
 
 ### SwiftPM ###
 
+### Vapor ###
+Config/secrets
+
+### Vapor Patch ###
+
 ### Windows ###
 # Windows thumbnail cache files
 Thumbs.db
@@ -162,4 +167,4 @@ $RECYCLE.BIN/
 !*.xcworkspace/contents.xcworkspacedata
 /*.gcno
 
-# End of https://www.gitignore.io/api/git,macos,linux,swift,xcode,windows,swiftpm,swiftpackagemanager
+# End of https://www.gitignore.io/api/git,macos,linux,swift,xcode,windows,swiftpm,swiftpackagemanager,vapor
