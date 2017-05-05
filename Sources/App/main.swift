@@ -13,6 +13,7 @@ drop.get { req in
 let db = Database(MemoryDriver())
 
 User.database = db
+Team.database = db
 Post.database = db
 
 drop.group("user") { user in
@@ -27,6 +28,15 @@ drop.group("token") { token in
     let controller = TokenController()
     
     token.post("generate", handler: controller.generate)
+}
+
+drop.group("team") { token in
+    
+    let controller = TeamController()
+    
+    token.post("create", handler: controller.create)
+    
+    token.get("list", handler: controller.list)
 }
 
 drop.resource("posts", PostController())

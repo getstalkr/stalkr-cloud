@@ -28,9 +28,10 @@ class UserController {
         
         var user = User(name: username, password: password)
         
+        let token = try user.createToken()
         try user.save()
         
-        return try JSON(node: ["success": true, "token": user.createToken()])
+        return try JSON(node: ["success": true, "token": token])
     }
     
     func login(request: Request) throws -> ResponseRepresentable {
@@ -43,10 +44,13 @@ class UserController {
             throw Abort.custom(status: Status.badRequest, message: "Missing username or password")
         }
         
-        guard let user = try User.query().filter("username", username).filter("password", password).first() else {
+        guard var user = try User.query().filter("username", username).filter("password", password).first() else {
             throw Abort.custom(status: Status.badRequest, message: "Wrong username or password")
         }
         
-        return try JSON(node: ["success": true, "token": user.createToken()])
+        let token = try user.createToken()
+        try user.save()
+        
+        return try JSON(node: ["success": true, "token": token])
     }
 }

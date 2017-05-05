@@ -28,13 +28,15 @@ class User: Model {
         id = try node.extract("id")
         username = try node.extract("username")
         password = try node.extract("password")
+        token = try node.extract("token")
     }
     
     func makeNode(context: Context) throws -> Node {
         return try Node(node: [
             "id": id,
             "username": username,
-            "password": password
+            "password": password,
+            "token": token
             ])
     }
     
@@ -58,6 +60,7 @@ extension User: Preparation {
             users.id()
             users.string("username")
             users.string("password")
+            users.string("token")
         }
     }
     
