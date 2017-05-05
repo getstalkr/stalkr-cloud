@@ -21,15 +21,11 @@ class TokenController {
             throw Abort.custom(status: Status.badRequest, message: "Missing user parameter")
         }
 
-        guard let user = try User.query().filter("name", name).first(), let id = user.id?.int else {
+        guard let user = try User.query().filter("name", name).first() else {
             throw Abort.custom(status: Status.badRequest, message: "User not found")
         }
-
-        let payload = Node([SubjectClaim("\(id)")])
-        let jwt = try JWT(payload: payload, signer: HS256(key: "jwtkey".makeBytes()))
-        let token = try jwt.createToken()
-        let decoded = try JWT(token: token)
         
-        return try JSON(node: ["token": token, "decoded_token": decoded.node])
+        let token = try user.createToken()
+        return try JSON(node: ["token": token, "decoded_token": JWT(token: token).node])
     }
 }

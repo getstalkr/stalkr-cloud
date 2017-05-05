@@ -6,6 +6,7 @@
 //
 //
 
+import JWT
 import Vapor
 import Fluent
 import Foundation
@@ -15,6 +16,7 @@ class User: Model {
     var id: Node?
     var username: String
     var password: String
+    var token: String?
     
     
     init(name: String, password: String) {
@@ -34,6 +36,15 @@ class User: Model {
             "username": username,
             "password": password
             ])
+    }
+    
+    func createToken() throws -> String {
+        let payload = Node([SubjectClaim("\(username)")])
+        let jwt = try JWT(payload: payload, signer: HS256(key: "jwtkey".makeBytes()))
+        
+        let token = try jwt.createToken()
+        self.token = token
+        return token
     }
 }
 

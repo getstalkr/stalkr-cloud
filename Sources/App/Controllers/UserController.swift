@@ -30,7 +30,7 @@ class UserController {
         
         try user.save()
         
-        return try JSON(node: ["success": true])
+        return try JSON(node: ["success": true, "token": user.createToken()])
     }
     
     func login(request: Request) throws -> ResponseRepresentable {
@@ -47,6 +47,6 @@ class UserController {
             throw Abort.custom(status: Status.badRequest, message: "Wrong username or password")
         }
         
-        return try JSON(node: ["success": true, "user": user.makeNode()])
+        return try JSON(node: ["success": true, "token": user.createToken()])
     }
 }
