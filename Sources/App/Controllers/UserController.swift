@@ -50,4 +50,21 @@ class UserController {
         
         return try JSON(node: ["success": true])
     }
+    
+    func login(request: Request) throws -> ResponseRepresentable {
+        
+        guard let username = request.data["username"]?.string else {
+            throw Abort.custom(status: Status.badRequest, message: "Missing username or password")
+        }
+        
+        guard let password = request.data["password"]?.string else {
+            throw Abort.custom(status: Status.badRequest, message: "Missing username or password")
+        }
+        
+        guard let user = try User.query().filter("username", username).filter("password", password).first() else {
+            throw Abort.custom(status: Status.badRequest, message: "Wrong username or password")
+        }
+        
+        return try JSON(node: ["success": true, "user": user.makeNode()])
+    }
 }

@@ -19,6 +19,7 @@ drop.group("user") { user in
     let controller = UserController()
     
     user.post("register", handler: controller.register)
+    user.post("login", handler: controller.login)
 }
 
 drop.group("token") { token in
