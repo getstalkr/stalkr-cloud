@@ -18,8 +18,7 @@ Post.database = db
 drop.group("user") { user in
     let controller = UserController()
     
-    user.post("add", handler: controller.add)
-    user.get("get", handler: controller.get)
+    user.post("register", handler: controller.register)
 }
 
 drop.group("token") { token in
