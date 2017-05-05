@@ -32,10 +32,14 @@ class TeamController {
         return JSON(["success": true])
     }
     
-    func list(request: Request) throws -> ResponseRepresentable {
+    func memberships(request: Request) throws -> ResponseRepresentable {
         
-        let teams = try Team.query().all()
+        guard let teamid = request.data["teamid"]?.uint else {
+            throw Abort.custom(status: Status.badRequest, message: "Missing teamid")
+        }
         
-        return try JSON(["teams": teams.makeNode()])
+        let memberships = try TeamMembership.query().filter("teamid", teamid).all()
+        
+        return try JSON(["memberships": memberships.makeNode()])
     }
 }

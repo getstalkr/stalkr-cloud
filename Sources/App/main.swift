@@ -38,7 +38,7 @@ drop.group("team") { token in
     
     token.post("create", handler: controller.create)
     
-    token.get("list", handler: controller.list)
+    token.get("memberships", handler: controller.memberships)
 }
 
 drop.resource("posts", PostController())
