@@ -48,6 +48,19 @@ class User: Model {
         self.token = token
         return token
     }
+    
+    func join(team: Team) throws -> TeamMembership? {
+        
+        guard let teamid = team.id, let userid = self.id else {
+            return nil
+        }
+        
+        var membership = TeamMembership(teamid: teamid, userid: userid)
+        
+        try membership.save()
+        
+        return membership
+    }
 }
 
 // Preparations

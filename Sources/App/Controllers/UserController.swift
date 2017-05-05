@@ -53,4 +53,35 @@ class UserController {
         
         return try JSON(node: ["success": true, "token": token])
     }
+    
+    func jointeam(request: Request) throws -> ResponseRepresentable {
+        
+        guard let teamid = request.data["teamid"]?.uint else {
+            throw Abort.custom(status: Status.badRequest, message: "Missing teamid")
+        }
+        
+        guard let team = try Team.query().filter("id", teamid).first() else {
+            throw Abort.custom(status: Status.badRequest, message: "Team does not exist")
+        }
+        
+        guard let token = request.data["token"]?.string else {
+            throw Abort.custom(status: Status.badRequest, message: "Missing token")
+        }
+        
+        guard let user = try User.query().filter("token", token).first(), let userid = user.id else {
+            throw Abort.custom(status: Status.badRequest, message: "No user for token")
+        }
+        
+        if try TeamMembership.query().filter("teamid", teamid).filter("userid", userid).first() != nil {
+            throw Abort.custom(status: Status.badRequest, message: "This Team Membership already exists")
+        }
+        
+        guard var membership = try user.join(team: team) else {
+            throw Abort.custom(status: Status.badRequest, message: "Could not join team")
+        }
+        
+        try membership.save()
+        
+        return try JSON(node: ["success": true, "membership": membership.makeNode()])
+    }
 }

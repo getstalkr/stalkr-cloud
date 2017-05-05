@@ -14,6 +14,7 @@ let db = Database(MemoryDriver())
 
 User.database = db
 Team.database = db
+TeamMembership.database = db
 Post.database = db
 
 drop.group("user") { user in
@@ -21,6 +22,7 @@ drop.group("user") { user in
     
     user.post("register", handler: controller.register)
     user.post("login", handler: controller.login)
+    user.post("jointeam", handler: controller.jointeam)
 }
 
 drop.group("token") { token in
