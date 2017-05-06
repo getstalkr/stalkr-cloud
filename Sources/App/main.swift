@@ -17,12 +17,20 @@ Team.database = db
 TeamMembership.database = db
 Post.database = db
 
+let mws = (
+    auth: AuthMiddleware(),
+    date: DateMiddleware()
+)
+
 drop.group("user") { user in
     let controller = UserController()
     
     user.post("register", handler: controller.register)
     user.post("login", handler: controller.login)
-    user.post("jointeam", handler: controller.jointeam)
+    
+    user.group(mws.auth) { authUser in
+        authUser.post("jointeam", handler: controller.jointeam)
+    }
 }
 
 drop.group("token") { token in
@@ -32,13 +40,15 @@ drop.group("token") { token in
     token.post("generate", handler: controller.generate)
 }
 
-drop.group("team") { token in
+drop.group("team") { team in
     
     let controller = TeamController()
     
-    token.post("create", handler: controller.create)
+    team.group(mws.auth) { authTeam in
+        authTeam.post("create", handler: controller.create)
+    }
     
-    token.get("memberships", handler: controller.memberships)
+    team.get("memberships", handler: controller.memberships)
 }
 
 drop.resource("posts", PostController())

@@ -14,16 +14,8 @@ class TeamController {
     
     func create(request: Request) throws -> ResponseRepresentable {
         
-        guard let token = request.data["token"]?.string else {
-            throw Abort.custom(status: Status.badRequest, message: "Missing token")
-        }
-        
         guard let name = request.data["name"]?.string else {
             throw Abort.custom(status: Status.badRequest, message: "Missing name")
-        }
-
-        guard let _ = try User.query().filter("token", token).first() else {
-            throw Abort.custom(status: Status.badRequest, message: "No user for token")
         }
         
         var team = Team(name: name)

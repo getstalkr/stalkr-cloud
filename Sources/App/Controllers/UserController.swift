@@ -64,12 +64,8 @@ class UserController {
             throw Abort.custom(status: Status.badRequest, message: "Team does not exist")
         }
         
-        guard let token = request.data["token"]?.string else {
-            throw Abort.custom(status: Status.badRequest, message: "Missing token")
-        }
-        
-        guard let user = try User.query().filter("token", token).first(), let userid = user.id else {
-            throw Abort.custom(status: Status.badRequest, message: "No user for token")
+        guard let user = request.user, let userid = user.id else {
+            throw Abort.custom(status: Status.badRequest, message: "No user")
         }
         
         if try TeamMembership.query().filter("teamid", teamid).filter("userid", userid).first() != nil {
