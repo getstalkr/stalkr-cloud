@@ -17,11 +17,11 @@ class AuthMiddleware: Middleware {
     func respond(to request: Request, chainingTo next: Responder) throws -> Response {
         
         guard let token = request.data["token"]?.string else {
-            throw Abort.custom(status: Status.badRequest, message: "missing token")
+            throw Abort(Status.badRequest, metadata: "missing token")
         }
         
-        guard let user = try User.query().filter("token", token).first() else {
-            throw Abort.custom(status: Status.badRequest, message: "invalid token")
+        guard let user = try User.makeQuery().filter("token", token).first() else {
+            throw Abort(Status.badRequest, metadata: "invalid token")
         }
         
         request.user = user

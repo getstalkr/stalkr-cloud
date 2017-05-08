@@ -15,10 +15,10 @@ class TeamController {
     func create(request: Request) throws -> ResponseRepresentable {
         
         guard let name = request.data["name"]?.string else {
-            throw Abort.custom(status: Status.badRequest, message: "Missing name")
+            throw Abort(Status.badRequest, metadata: "Missing name")
         }
         
-        var team = Team(name: name)
+        let team = Team(name: name)
         try team.save()
         
         return JSON(["success": true])
@@ -27,11 +27,11 @@ class TeamController {
     func memberships(request: Request) throws -> ResponseRepresentable {
         
         guard let teamid = request.data["teamid"]?.uint else {
-            throw Abort.custom(status: Status.badRequest, message: "Missing teamid")
+            throw Abort(Status.badRequest, metadata: "Missing teamid")
         }
         
-        let memberships = try TeamMembership.query().filter("teamid", teamid).all()
+        let memberships = try TeamMembership.makeQuery().filter("teamid", teamid).all()
         
-        return try JSON(["memberships": memberships.makeNode()])
+        return try JSON(node: memberships)
     }
 }

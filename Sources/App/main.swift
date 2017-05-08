@@ -1,21 +1,20 @@
 import Vapor
-import Fluent
+import FluentProvider
 import JWT
 
-let drop = Droplet()
+let drop = try Droplet()
 
-drop.get { req in
-    return try drop.view.make("welcome", [
-        "message": drop.localization[req.lang, "welcome", "title"]
-        ])
-}
-
-let db = Database(MemoryDriver())
+let db = Database(try MemoryDriver())
 
 User.database = db
 Team.database = db
 TeamMembership.database = db
 Post.database = db
+
+try User.prepare(db)
+try Team.prepare(db)
+try TeamMembership.prepare(db)
+try Post.prepare(db)
 
 let mws = (
     auth: AuthMiddleware(),
@@ -53,4 +52,4 @@ drop.group("team") { team in
 
 drop.resource("posts", PostController())
 
-drop.run()
+try drop.run()

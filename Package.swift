@@ -3,8 +3,9 @@ import PackageDescription
 let package = Package(
     name: "stalkr-cloud",
     dependencies: [
-        .Package(url: "https://github.com/vapor/vapor.git", majorVersion: 1, minor: 5),
-        .Package(url: "https://github.com/vapor/jwt.git", majorVersion: 1)
+        .Package(url: "https://github.com/vapor/vapor.git", Version(2,0,0, prereleaseIdentifiers: ["beta"])),
+        .Package(url: "https://github.com/vapor/fluent-provider.git", Version(1,0,0, prereleaseIdentifiers: ["beta"])),
+        .Package(url: "https://github.com/vapor/jwt.git", Version(2,0,0, prereleaseIdentifiers: ["beta"]))
     ],
     exclude: [
         "Config",

@@ -11,18 +11,14 @@ import HTTP
 import Vapor
 import Foundation
 
-import Turnstile
-import TurnstileWeb
-import TurnstileCrypto
-
 class TokenController {
     func generate(request: Request) throws -> ResponseRepresentable {
         guard let name = request.data["user"]?.string else {
-            throw Abort.custom(status: Status.badRequest, message: "Missing user parameter")
+            throw Abort(Status.badRequest, metadata: "Missing user parameter")
         }
 
-        guard let user = try User.query().filter("name", name).first() else {
-            throw Abort.custom(status: Status.badRequest, message: "User not found")
+        guard let user = try User.makeQuery().filter("name", name).first() else {
+            throw Abort(Status.badRequest, metadata: "User not found")
         }
         
         let token = try user.createToken()

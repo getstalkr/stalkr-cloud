@@ -8,29 +8,48 @@
 
 import JWT
 import Vapor
-import Fluent
+import FluentProvider
 import Foundation
 
 class Team: Model {
 
+    var storage = Storage()
+
     var id: Node?
     var name: String
-
     
     init(name: String) {
         self.name = name
     }
     
+    required init(row: Row) throws {
+        id = try row.get("id")
+        name = try row.get("name")
+    }
+    
     required init(node: Node, in context: Context) throws {
-        id = try node.extract("id")
-        name = try node.extract("name")
+        id = try node.get("id")
+        name = try node.get("name")
+    }
+    
+    func makeRow() throws -> Row {
+        
+        var row = Row()
+        
+        try row.set("id", id)
+        try row.set("name", name)
+        
+        return row
     }
     
     func makeNode(context: Context) throws -> Node {
-        return try Node(node: [
-            "id": id,
-            "name": name
-            ])
+        
+        var node = Node([:], in: context)
+        
+        try node.set("id", id)
+        try node.set("name", name)
+        
+        return node
     }
 }
 
@@ -39,14 +58,13 @@ class Team: Model {
 extension Team: Preparation {
     
     static func prepare(_ database: Database) throws {
-        
-        try database.create("teams") { users in
+        try database.create(self) { users in
             users.id()
             users.string("name")
         }
     }
     
     static func revert(_ database: Database) throws {
-        try database.delete("teams")
+        try database.delete(self)
     }
 }

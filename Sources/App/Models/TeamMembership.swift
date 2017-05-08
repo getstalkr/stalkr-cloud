@@ -8,33 +8,49 @@
 
 import JWT
 import Vapor
-import Fluent
+import FluentProvider
 import Foundation
 
-class TeamMembership: Model {
+class TeamMembership: Model, NodeConvertible {
+
+    let storage = Storage()
     
     var id: Node?
     var teamid: Node
     var userid: Node
-    
     
     init(teamid: Node, userid: Node) {
         self.teamid = teamid
         self.userid = userid
     }
     
-    required init(node: Node, in context: Context) throws {
-        id = try node.extract("id")
-        teamid = try node.extract("teamid")
-        userid = try node.extract("userid")
+    required init(node: Node) throws {
+        self.teamid = try node.get("teamid")
+        self.userid = try node.get("userid")
     }
     
-    func makeNode(context: Context) throws -> Node {
-        return try Node(node: [
-            "id": id,
-            "teamid": teamid,
-            "userid": userid
-            ])
+    required init(row: Row) throws {
+        id = try row.get("id")
+        teamid = try row.get("teamid")
+        userid = try row.get("userid")
+    }
+    
+    func makeRow() throws -> Row {
+        var row = Row()
+        try row.set("id", id)
+        try row.set("teamid", teamid)
+        try row.set("userid", userid)
+        
+        return row
+    }
+    
+    func makeNode(in context: Context?) throws -> Node {
+        var node = Node([:], in: context)
+        try node.set("id", id)
+        try node.set("teamid", teamid)
+        try node.set("userid", userid)
+        
+        return node
     }
 }
 
@@ -44,14 +60,14 @@ extension TeamMembership: Preparation {
     
     static func prepare(_ database: Database) throws {
         
-        try database.create("team_memberships") { users in
+        try database.create(self) { users in
             users.id()
-            users.id("teamid", optional: false, unique: true, default: nil)
-            users.id("userid", optional: false, unique: true, default: nil)
+            users.string("teamid", optional: false, unique: false, default: nil)
+            users.string("userid", optional: false, unique: false, default: nil)
         }
     }
     
     static func revert(_ database: Database) throws {
-        try database.delete("users")
+        try database.delete(self)
     }
 }
