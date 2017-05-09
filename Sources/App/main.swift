@@ -14,11 +14,17 @@ Post.database = db
 try User.prepare(db)
 try Team.prepare(db)
 try TeamMembership.prepare(db)
+try Role.prepare(db)
+try RoleAssignment.prepare(db)
 try Post.prepare(db)
 
-let mws = (
-    auth: AuthMiddleware(),
-    date: DateMiddleware()
+try User(name: "admin", password: "123456").save()
+try User.withName("admin")?.assign(role: try Role.withName("user")!)
+try User.withName("admin")?.assign(role: try Role.withName("admin")!)
+
+let auth = (
+    user: AuthMiddleware(roleNames: ["user"]),
+    admin: AuthMiddleware(roleNames: ["admin"])
 )
 
 drop.group("user") { user in
@@ -27,7 +33,7 @@ drop.group("user") { user in
     user.post("register", handler: controller.register)
     user.post("login", handler: controller.login)
     
-    user.group(mws.auth) { authUser in
+    user.group(auth.user) { authUser in
         authUser.post("jointeam", handler: controller.jointeam)
     }
 }
@@ -43,13 +49,24 @@ drop.group("team") { team in
     
     let controller = TeamController()
     
-    team.group(mws.auth) { authTeam in
+    team.group(auth.user) { authTeam in
         authTeam.post("create", handler: controller.create)
     }
     
     team.get("memberships", handler: controller.memberships)
 }
 
+drop.group("role") { role in
+    
+    let controller = RoleController()
+    
+    role.get("roles", handler: controller.roles)
+    role.get("assignments", handler: controller.assignments)
+    
+    role.group(auth.admin) { authAdmin in
+        authAdmin.post("assign", handler: controller.assign)
+    }
+}
 drop.resource("posts", PostController())
 
 try drop.run()

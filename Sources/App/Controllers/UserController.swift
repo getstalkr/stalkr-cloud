@@ -26,12 +26,13 @@ class UserController {
             throw Abort(Status.badRequest, metadata: "Username already in use")
         }
         
-        let user = User(name: username, password: password)
+        try User(name: username, password: password).save()
         
-        let token = try user.createToken()
-        try user.save()
-        
-        return try JSON(node: ["success": true, "token": token])
+        if let token = try User.withName(username)?.createToken() {
+            return try JSON(node: ["success": true, "token": token])
+        } else {
+            return try JSON(node: ["success": true, "token": "could not create token"])
+        }
     }
     
     func login(request: Request) throws -> ResponseRepresentable {
@@ -49,7 +50,6 @@ class UserController {
         }
         
         let token = try user.createToken()
-        try user.save()
         
         return try JSON(node: ["success": true, "token": token])
     }
@@ -72,12 +72,10 @@ class UserController {
             throw Abort(Status.badRequest, metadata: "This Team Membership already exists")
         }
         
-        guard let membership = try user.join(team: team) else {
+        guard try user.join(team: team) else {
             throw Abort(Status.badRequest, metadata: "Could not join team")
         }
         
-        try membership.save()
-        
-        return try JSON(node: Node(node: ["success": true, "membership": membership.makeNode(in: nil)]))
+        return JSON(["success": true])
     }
 }

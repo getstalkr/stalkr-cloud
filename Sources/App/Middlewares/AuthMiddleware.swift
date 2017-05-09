@@ -14,6 +14,12 @@ import Foundation
 
 class AuthMiddleware: Middleware {
     
+    let roleNames: Set<String>
+    
+    init(roleNames: Set<String>) {
+        self.roleNames = roleNames
+    }
+    
     func respond(to request: Request, chainingTo next: Responder) throws -> Response {
         
         guard let token = request.data["token"]?.string else {
@@ -22,6 +28,10 @@ class AuthMiddleware: Middleware {
         
         guard let user = try User.makeQuery().filter("token", token).first() else {
             throw Abort(Status.badRequest, metadata: "invalid token")
+        }
+        
+        guard roleNames.isSubset(of: try user.assignments().map { try $0.role()! }.map { $0.name }) else {
+            throw Abort(Status.unauthorized, metadata: "unauthorized")
         }
         
         request.user = user
