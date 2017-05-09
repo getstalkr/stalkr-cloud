@@ -61,9 +61,19 @@ extension TeamMembership: Preparation {
     static func prepare(_ database: Database) throws {
         
         try database.create(self) { users in
+            
             users.id()
-            users.string("teamid", optional: false, unique: false, default: nil)
-            users.string("userid", optional: false, unique: false, default: nil)
+            
+            let teamid = Field(name: "teamid", type: .int, optional: false,
+                               unique: false, default: nil, primaryKey: true)
+            let userid = Field(name: "userid", type: .int, optional: false,
+                               unique: false, default: nil, primaryKey: true)
+        
+            users.field(teamid)
+            users.field(userid)
+            
+            users.foreignKey("teamid", references: "id", on: Team.self)
+            users.foreignKey("userid", references: "id", on: User.self)
         }
     }
     
