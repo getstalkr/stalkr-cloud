@@ -12,6 +12,23 @@ import Foundation
 
 class TeamController {
     
+    let drop: Droplet
+    
+    init(drop: Droplet) {
+        self.drop = drop
+    }
+    
+    func addRoutes() {
+        drop.group("team") { team in
+            
+            team.group(AuthMiddleware.user) { authTeam in
+                authTeam.post("create", handler: create)
+            }
+            
+            team.get("memberships", handler: memberships)
+        }
+    }
+    
     func create(request: Request) throws -> ResponseRepresentable {
         
         guard let name = request.data["name"]?.string else {

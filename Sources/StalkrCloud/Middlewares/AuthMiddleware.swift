@@ -14,6 +14,9 @@ import Foundation
 
 class AuthMiddleware: Middleware {
     
+    static var admin: AuthMiddleware = AuthMiddleware(roleNames: ["admin"])
+    static var user: AuthMiddleware = AuthMiddleware(roleNames: ["user"])
+    
     let roleNames: Set<String>
     
     init(roleNames: Set<String>) {

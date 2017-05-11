@@ -12,6 +12,24 @@ import Foundation
 
 class UserController {
     
+    let drop: Droplet
+    
+    init(drop: Droplet) {
+        self.drop = drop
+    }
+    
+    func addRoutes() {
+        drop.group("user") { user in
+            
+            user.post("register", handler: register)
+            user.post("login", handler: login)
+            
+            user.group(AuthMiddleware.user) { authUser in
+                authUser.post("jointeam", handler: jointeam)
+            }
+        }
+    }
+    
     func register(request: Request) throws -> ResponseRepresentable {
         
         guard let username = request.data["username"]?.string else {

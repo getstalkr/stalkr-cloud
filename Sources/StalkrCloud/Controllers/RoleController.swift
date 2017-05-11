@@ -12,6 +12,24 @@ import Foundation
 
 class RoleController {
     
+    let drop: Droplet
+    
+    init(drop: Droplet) {
+        self.drop = drop
+    }
+    
+    func addRoutes() {
+        drop.group("role") { role in
+            
+            role.get("roles", handler: roles)
+            role.get("assignments", handler: assignments)
+            
+            role.group(AuthMiddleware.admin) { authAdmin in
+                authAdmin.post("assign", handler: assign)
+            }
+        }
+    }
+    
     func roles(request: Request) throws -> ResponseRepresentable {
         return try Role.all().makeJSON()
     }
