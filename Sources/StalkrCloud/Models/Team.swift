@@ -11,7 +11,7 @@ import Vapor
 import FluentProvider
 import Foundation
 
-class Team: Model {
+final class Team: Model {
     static func make(for parameter: String) throws -> Self {
         fatalError("not implemented")
     }

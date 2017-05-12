@@ -11,15 +11,13 @@ import Vapor
 import FluentProvider
 import Foundation
 
-class User: Model {
+final class User: Model {
     static func make(for parameter: String) throws -> Self {
         fatalError("not implemented")
     }
 
     /// the unique key to use as a slug in route building
     static var uniqueSlug: String = "user"
-
-
 
     let storage = Storage()
 
@@ -30,7 +28,7 @@ class User: Model {
     var token: String?
     
     
-    init(name: String, password: String) {
+    public init(name: String, password: String) {
         self.username = name
         self.password = password
     }
@@ -127,6 +125,7 @@ extension User {
     
     // TODO: list teams
     
+    @discardableResult
     func join(team: Team) throws -> Bool {
         
         guard let teamid = team.id, let userid = self.id else {

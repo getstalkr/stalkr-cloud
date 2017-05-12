@@ -13,27 +13,16 @@ import Fluent
 public class Provider: Vapor.Provider {
     /// Called before the Droplet begins serving
     /// which is @noreturn.
-    public func beforeRun(_ drop: Droplet) throws {
-        
-        try setup(drop)
-        
-        // Init Controllers
-        
-        let roleController = RoleController(drop: drop)
-        let teamController = TeamController(drop: drop)
-        let userController = UserController(drop: drop)
-        
-        // Add Routes
-        
-        roleController.addRoutes()
-        teamController.addRoutes()
-        userController.addRoutes()
-    }
+    public func beforeRun(_ drop: Droplet) throws { }
 
     /// Called after the provider has initialized
     /// in the `Config.addProvider` call.
     public func boot(_ config: Config) throws {
-        
+        config.preparations.append(User.self)
+        config.preparations.append(Team.self)
+        config.preparations.append(TeamMembership.self)
+        config.preparations.append(Role.self)
+        config.preparations.append(RoleAssignment.self)
     }
 
     /// This should be the name of the actual repository
@@ -48,18 +37,13 @@ public class Provider: Vapor.Provider {
     /// it is HIGHLY recommended to provide a static let
     /// for performance considerations
     public static let repositoryName: String = "stalkr-cloud"
+    
+    required public init(config: Config) throws {
 
-    public init() {
-        
     }
-    
-    required convenience public init(config: Config) throws {
-        self.init()
-    }
-    
     
     public func boot(_ drop: Droplet) throws {
-        setup(drop)
+        try setup(drop)
     }
 
     
@@ -68,21 +52,22 @@ public class Provider: Vapor.Provider {
         // Preparations
         
         if let db = drop.database {
-            User.database = db
-            Team.database = db
-            TeamMembership.database = db
-            Role.database = db
-            RoleAssignment.database = db
-            
-            try User.prepare(db)
-            try Team.prepare(db)
-            try TeamMembership.prepare(db)
-            try Role.prepare(db)
-            try RoleAssignment.prepare(db)
             
             try User(name: "admin", password: "123456").save()
             try User.withName("admin")?.assign(role: try Role.withName("user")!)
             try User.withName("admin")?.assign(role: try Role.withName("admin")!)
         }
+        
+        // Init Controllers
+        
+        let roleController = RoleController(drop: drop)
+        let teamController = TeamController(drop: drop)
+        let userController = UserController(drop: drop)
+        
+        // Add Routes
+        
+        roleController.addRoutes()
+        teamController.addRoutes()
+        userController.addRoutes()
     }
 }

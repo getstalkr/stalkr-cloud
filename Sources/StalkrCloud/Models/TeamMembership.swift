@@ -11,7 +11,7 @@ import Vapor
 import FluentProvider
 import Foundation
 
-class TeamMembership: Model, NodeConvertible {
+final class TeamMembership: Model, NodeConvertible {
     static func make(for parameter: String) throws -> Self {
         fatalError("not implemented")
     }
@@ -79,8 +79,8 @@ extension TeamMembership: Preparation {
             users.field(teamid)
             users.field(userid)
             
-            users.foreignKey("teamid", references: "id", on: Team.self)
-            users.foreignKey("userid", references: "id", on: User.self)
+            users.foreignKey(foreignIdKey: "teamid", referencesIdKey: "id", on: Team.self, name: nil)
+            users.foreignKey(foreignIdKey: "userid", referencesIdKey: "id", on: User.self, name: nil)
         }
     }
     

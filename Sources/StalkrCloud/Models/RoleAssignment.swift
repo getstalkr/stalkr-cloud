@@ -68,9 +68,9 @@ extension RoleAssignment: Preparation {
             
             users.field(roleid)
             users.field(userid)
-            
-            users.foreignKey("roleid", references: "id", on: Role.self)
-            users.foreignKey("userid", references: "id", on: User.self)
+
+            users.foreignKey(foreignIdKey: "roleid", referencesIdKey: "id", on: Role.self, name: nil)
+            users.foreignKey(foreignIdKey: "userid", referencesIdKey: "id", on: User.self, name: nil)
         }
     }
     

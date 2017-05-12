@@ -4,9 +4,7 @@ import JWT
 import StalkrCloud
 
 let config = try Config()
-
-try config.addProvider(FluentProvider.Provider.self)
-try config.addProvider(StalkrCloud.Provider.self)
+try config.setup()
 
 let drop = try Droplet(config)
 
