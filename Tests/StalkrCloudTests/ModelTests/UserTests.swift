@@ -48,9 +48,25 @@ class UserTest: XCTestCase {
         
         try user.join(team: team)
         
-        let membershipQuery = try TeamMembership.makeQuery().filter("userid", user.id)
-                                                            .filter("teamid", team.id)
+        let query = try TeamMembership.makeQuery().filter("userid", user.id)
+                                                  .filter("teamid", team.id)
         
-        XCTAssertNotNil(try membershipQuery.first(), "team_membership not created")
+        XCTAssertNotNil(try query.first(), "team_membership not created")
+    }
+    
+    func testThatUserAssignsRole() throws {
+        
+        let role = RoleBuilder().build()
+        try role.save()
+        
+        let user = UserBuilder().build()
+        try user.save()
+        
+        try user.assign(role: role)
+        
+        let query = try RoleAssignment.makeQuery().filter("userid", user.id)
+                                                  .filter("roleid", role.id)
+        
+        XCTAssertNotNil(try query.first(), "role_assignment not created")
     }
 }

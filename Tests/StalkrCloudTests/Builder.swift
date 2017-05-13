@@ -58,3 +58,15 @@ final class TeamBuilder: Builder {
         return Team(name: name)
     }
 }
+
+final class RoleBuilder: Builder {
+    
+    typealias T = Role
+    
+    var name: String = "anyName"
+    var readableName: String = "anyReadableName"
+    
+    func finish() -> Role {
+        return Role(name: name, readableName: readableName)
+    }
+}
