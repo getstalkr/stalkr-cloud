@@ -22,11 +22,10 @@ final class TeamMembership: Model, NodeConvertible {
 
     let storage = Storage()
     
-    var id: Node?
-    var teamid: Node
-    var userid: Node
+    var teamid: Identifier
+    var userid: Identifier
     
-    init(teamid: Node, userid: Node) {
+    init(teamid: Identifier, userid: Identifier) {
         self.teamid = teamid
         self.userid = userid
     }
@@ -37,7 +36,6 @@ final class TeamMembership: Model, NodeConvertible {
     }
     
     required init(row: Row) throws {
-        id = try row.get("id")
         teamid = try row.get("teamid")
         userid = try row.get("userid")
     }

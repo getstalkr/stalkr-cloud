@@ -22,7 +22,6 @@ final class User: Model {
     let storage = Storage()
 
     
-    var id: Node?
     var username: String
     var password: String
     var token: String?
@@ -34,7 +33,6 @@ final class User: Model {
     }
     
     required init(row: Row) throws {
-        id = try row.get("id")
         username = try row.get("username")
         password = try row.get("password")
         token = try row.get("token")

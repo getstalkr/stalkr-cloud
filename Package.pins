@@ -83,7 +83,7 @@
       "package": "Node",
       "reason": null,
       "repositoryURL": "https://github.com/vapor/node.git",
-      "version": "2.0.0-beta.6"
+      "version": "2.0.0-beta.7"
     },
     {
       "package": "PathIndexable",

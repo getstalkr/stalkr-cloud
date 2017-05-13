@@ -21,11 +21,10 @@ final class RoleAssignment: Model {
     
     let storage = Storage()
     
-    var id: Node?
-    var roleid: Node
-    var userid: Node
+    var roleid: Identifier
+    var userid: Identifier
     
-    init(roleid: Node, userid: Node) {
+    init(roleid: Identifier, userid: Identifier) {
         self.roleid = roleid
         self.userid = userid
     }
@@ -36,7 +35,6 @@ final class RoleAssignment: Model {
     }
     
     required init(row: Row) throws {
-        id = try row.get("id")
         roleid = try row.get("roleid")
         userid = try row.get("userid")
     }

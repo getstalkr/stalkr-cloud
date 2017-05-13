@@ -22,7 +22,6 @@ final class Team: Model {
 
     var storage = Storage()
 
-    var id: Node?
     var name: String
     
     init(name: String) {
@@ -30,12 +29,10 @@ final class Team: Model {
     }
     
     required init(row: Row) throws {
-        id = try row.get("id")
         name = try row.get("name")
     }
     
     required init(node: Node, in context: Context) throws {
-        id = try node.get("id")
         name = try node.get("name")
     }
     

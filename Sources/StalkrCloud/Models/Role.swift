@@ -21,7 +21,6 @@ final class Role: Model {
     
     var storage = Storage()
     
-    var id: Node?
     var name: String
     var readableName: String
     
@@ -31,13 +30,11 @@ final class Role: Model {
     }
     
     required init(row: Row) throws {
-        id = try row.get("id")
         name = try row.get("name")
         readableName = try row.get("readable_name")
     }
     
     required init(node: Node, in context: Context) throws {
-        id = try node.get("id")
         name = try node.get("name")
         readableName = try node.get("readable_name")
     }
