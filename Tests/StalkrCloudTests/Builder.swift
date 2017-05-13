@@ -1,5 +1,5 @@
 //
-//  SubjectBuilder.swift
+//  Builder.swift
 //  stalkr-cloud
 //
 //  Created by Matheus Martins on 5/12/17.
@@ -16,31 +16,45 @@ import FluentProvider
 
 protocol Builder {
     
-    associatedtype T: Model
+    associatedtype T
     
     typealias BuilderClosure = (Self) -> ()
     
-    init(buildClosure: BuilderClosure)
+    init()
     
-    func build() -> T
+    func build(buildClosure: BuilderClosure?) -> T
+    
+    func finish() -> T
 }
 
-class UserBuilder: Builder
+extension Builder {
+    func build(buildClosure: BuilderClosure? = nil) -> T {
+        buildClosure?(self)
+        return finish()
+    }
+}
 
+final class UserBuilder: Builder {
+    
     typealias T = User
 
     var username: String = "anyUsername"
     var password: String = "anyPassword"
 
-    required init(buildClosure: (UserBuilder) -> ()) {
+    func finish() -> User {
+        let user = User(name: username, password: password)
         
-    }
-    
-    func build() -> User {
-        
+        return user
     }
 }
 
-class SubjectBuilder {
+final class TeamBuilder: Builder {
     
+    typealias T = Team
+    
+    var name: String = "anyName"
+    
+    func finish() -> Team {
+        return Team(name: name)
+    }
 }
