@@ -16,9 +16,9 @@ import JWT
 
 class TeamTest: XCTestCase {
     
-    private static var drop: Droplet!
+    private var drop: Droplet!
     
-    override static func setUp() {
+    override func setUp() {
         drop = Droplet.test
     }
     
@@ -28,6 +28,6 @@ class TeamTest: XCTestCase {
         
         try team.save()
         
-        XCTAssert(team.exists, "user not saved")
+        XCTAssert(team.exists, "team not saved")
     }
 }

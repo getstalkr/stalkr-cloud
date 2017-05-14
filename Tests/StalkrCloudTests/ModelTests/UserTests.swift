@@ -16,9 +16,9 @@ import JWT
 
 class UserTest: XCTestCase {
     
-    private static var drop: Droplet!
+    private var drop: Droplet!
     
-    static override func setUp() {
+    override func setUp() {
         drop = Droplet.test
     }
     
@@ -44,8 +44,9 @@ class UserTest: XCTestCase {
         
         try user.save()
         
-        XCTAssert(try user.join(team: team), "could not join team")
-        XCTAssertNotNil(try user.memberships().count == 1, "team_membership not created")
+        _ = try user.join(team: team)
+        
+        XCTAssertNotNil(try user.memberships().count == 1, "team_membership not saved")
     }
     
     func testThatUserAssignsRole() throws {
@@ -59,8 +60,9 @@ class UserTest: XCTestCase {
         
         try user.save()
         
-        XCTAssert(try user.assign(role: role), "could not assign")
-        XCTAssert(try user.assignments().count == 1, "role_assignment not created")
+        _ = try user.assign(role: role)
+        
+        XCTAssert(try user.assignments().count == 1, "role_assignment not saved")
     }
     
     func testThatUserCreatesToken() throws {
@@ -75,6 +77,6 @@ class UserTest: XCTestCase {
         
         let queryUser = try User.makeQuery().filter("token", token).first()
         
-        XCTAssertEqual(user.id, queryUser?.id, "token not created")
+        XCTAssertEqual(user.id, queryUser?.id, "token not saved")
     }
 }

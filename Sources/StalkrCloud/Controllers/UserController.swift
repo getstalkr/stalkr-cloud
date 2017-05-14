@@ -44,13 +44,11 @@ class UserController {
             throw Abort(Status.badRequest, metadata: "Username already in use")
         }
         
-        try User(name: username, password: password).save()
+        let user = try User(name: username, password: password)
         
-        if let token = try User.withName(username)?.createToken() {
-            return try JSON(node: ["success": true, "token": token])
-        } else {
-            return try JSON(node: ["success": true, "token": "could not create token"])
-        }
+        try user.save()
+        
+        return try JSON(node: ["success": true, "token": try user.createToken()])
     }
     
     func login(request: Request) throws -> ResponseRepresentable {

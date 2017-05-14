@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import Vapor
+@testable import Vapor
 
 extension Droplet {
     static let test: Droplet = {
