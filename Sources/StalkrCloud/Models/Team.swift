@@ -65,3 +65,11 @@ extension Team: Preparation {
         try database.delete(self)
     }
 }
+
+// TeamMemberships
+
+extension Team {
+    func memberships() throws -> [TeamMembership] {
+        return try TeamMembership.makeQuery().filter("teamid", id).all()
+    }
+}
