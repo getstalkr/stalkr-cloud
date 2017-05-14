@@ -100,8 +100,9 @@ extension User {
 // MARK: Teams
 
 extension User {
-    
-    // TODO: list teams
+    func memberships() throws -> [TeamMembership] {
+        return try TeamMembership.makeQuery().filter("userid", id).all()
+    }
     
     @discardableResult
     func join(team: Team) throws -> Bool {
