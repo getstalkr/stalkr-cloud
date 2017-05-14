@@ -16,18 +16,10 @@ import JWT
 
 class UserTest: XCTestCase {
     
-    private static var config: Config!
     private static var drop: Droplet!
     
     static override func setUp() {
-        do {
-            config = try Config()
-            try config.setup()
-
-            drop = try Droplet(config)
-        } catch {
-            fatalError(error.localizedDescription)
-        }
+        drop = Droplet.test
     }
     
     func testThatUserExists() throws {
@@ -52,12 +44,8 @@ class UserTest: XCTestCase {
         
         try user.save()
         
-        try user.join(team: team)
-        
-        let query = try TeamMembership.makeQuery().filter("userid", user.id)
-                                                  .filter("teamid", team.id)
-        
-        XCTAssertNotNil(try query.first(), "team_membership not created")
+        XCTAssert(try user.join(team: team), "could not join team")
+        XCTAssertNotNil(try user.memberships().count == 1, "team_membership not created")
     }
     
     func testThatUserAssignsRole() throws {
@@ -71,8 +59,7 @@ class UserTest: XCTestCase {
         
         try user.save()
         
-        try user.assign(role: role)
-        
+        XCTAssert(try user.assign(role: role), "could not assign")
         XCTAssert(try user.assignments().count == 1, "role_assignment not created")
     }
     

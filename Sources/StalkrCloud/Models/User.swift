@@ -82,7 +82,6 @@ extension User {
         return try RoleAssignment.makeQuery().filter("userid", id).all()
     }
     
-    @discardableResult
     func assign(role: Role) throws -> Bool {
         
         guard let roleid = role.id, let userid = self.id else {
@@ -104,7 +103,6 @@ extension User {
         return try TeamMembership.makeQuery().filter("userid", id).all()
     }
     
-    @discardableResult
     func join(team: Team) throws -> Bool {
         
         guard let teamid = team.id, let userid = self.id else {
