@@ -73,5 +73,21 @@ class UserTest: XCTestCase {
         
         try user.assign(role: role)
         
-        XCTAssert(try user.assignments().count == 1, "role_assignment not created")    }
+        XCTAssert(try user.assignments().count == 1, "role_assignment not created")
+    }
+    
+    func testThatUserCreatesToken() throws {
+        
+        let user = UserBuilder().build {
+            $0.uniqueUsername()
+        }
+        
+        try user.save()
+        
+        let token = try user.createToken()
+        
+        let queryUser = try User.makeQuery().filter("token", token).first()
+        
+        XCTAssertEqual(user.id, queryUser?.id, "token not created")
+    }
 }

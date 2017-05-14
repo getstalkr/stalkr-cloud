@@ -12,20 +12,12 @@ import FluentProvider
 import Foundation
 
 final class User: Model {
-    static func make(for parameter: String) throws -> Self {
-        fatalError("not implemented")
-    }
-
-    /// the unique key to use as a slug in route building
-    static var uniqueSlug: String = "user"
 
     let storage = Storage()
-
     
     var username: String
     var password: String
     var token: String?
-    
     
     public init(name: String, password: String) {
         self.username = name
