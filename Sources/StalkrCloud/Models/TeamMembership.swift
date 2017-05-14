@@ -11,7 +11,7 @@ import Vapor
 import FluentProvider
 import Foundation
 
-final class TeamMembership: Model, NodeConvertible {
+final class TeamMembership: Model {
     static func make(for parameter: String) throws -> Self {
         fatalError("not implemented")
     }
@@ -30,11 +30,6 @@ final class TeamMembership: Model, NodeConvertible {
         self.userid = userid
     }
     
-    required init(node: Node) throws {
-        self.teamid = try node.get("teamid")
-        self.userid = try node.get("userid")
-    }
-    
     required init(row: Row) throws {
         teamid = try row.get("teamid")
         userid = try row.get("userid")
@@ -47,15 +42,6 @@ final class TeamMembership: Model, NodeConvertible {
         try row.set("userid", userid)
         
         return row
-    }
-    
-    func makeNode(in context: Context?) throws -> Node {
-        var node = Node([:], in: context)
-        try node.set("id", id)
-        try node.set("teamid", teamid)
-        try node.set("userid", userid)
-        
-        return node
     }
 }
 

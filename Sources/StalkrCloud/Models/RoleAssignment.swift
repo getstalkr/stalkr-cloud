@@ -29,11 +29,6 @@ final class RoleAssignment: Model {
         self.userid = userid
     }
     
-    required init(node: Node) throws {
-        self.roleid = try node.get("roleid")
-        self.userid = try node.get("userid")
-    }
-    
     required init(row: Row) throws {
         roleid = try row.get("roleid")
         userid = try row.get("userid")

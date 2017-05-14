@@ -73,9 +73,5 @@ class UserTest: XCTestCase {
         
         try user.assign(role: role)
         
-        let query = try RoleAssignment.makeQuery().filter("userid", user.id)
-            .filter("roleid", role.id)
-        
-        XCTAssertNotNil(try query.first(), "role_assignment not created")
-    }
+        XCTAssert(try user.assignments().count == 1, "role_assignment not created")    }
 }

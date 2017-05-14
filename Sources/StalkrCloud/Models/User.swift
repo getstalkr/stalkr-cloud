@@ -49,18 +49,6 @@ final class User: Model {
         return row
     }
     
-    func makeNode(in context: Context?) throws -> Node {
-        
-        var node = Node([:], in: context)
-        
-        try node.set("id", id)
-        try node.set("username", username)
-        try node.set("password", password)
-        try node.set("token", token)
-        
-        return node
-    }
-    
     func createToken() throws -> String {
         let payload = try Node(node: ["user": id])
         let jwt = try JWT(payload: JSON(payload), signer: HS256(key: "jwtkey".makeBytes()))

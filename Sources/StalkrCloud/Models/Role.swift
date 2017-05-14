@@ -34,11 +34,6 @@ final class Role: Model {
         readableName = try row.get("readable_name")
     }
     
-    required init(node: Node, in context: Context) throws {
-        name = try node.get("name")
-        readableName = try node.get("readable_name")
-    }
-    
     func makeRow() throws -> Row {
         
         var row = Row()
@@ -48,17 +43,6 @@ final class Role: Model {
         try row.set("readable_name", readableName)
         
         return row
-    }
-    
-    func makeNode(context: Context) throws -> Node {
-        
-        var node = Node([:], in: context)
-        
-        try node.set("id", id)
-        try node.set("name", name)
-        try node.set("readable_name", readableName)
-        
-        return node
     }
     
     class func withName(_ name: String) throws -> Role? {
