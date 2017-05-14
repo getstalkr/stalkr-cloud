@@ -32,10 +32,13 @@ class UserTest: XCTestCase {
     
     func testThatUserExists() throws {
         
-        let user = UserBuilder().build()
-        try user.save()
+        let user = UserBuilder().build {
+            $0.uniqueUsername()
+        }
         
-        XCTAssertFalse(user.exists, "user not saved")
+        do { try user.save() } catch { fatalError(error.localizedDescription) }
+        
+        XCTAssert(user.exists, "user not saved")
     }
     
     func testThatUserJoinsTeam() throws {
@@ -43,8 +46,11 @@ class UserTest: XCTestCase {
         let team = TeamBuilder().build()
         try team.save()
         
-        let user = UserBuilder().build()
-        try user.save()
+        let user = UserBuilder().build {
+            $0.uniqueUsername()
+        }
+        
+        do { try user.save() } catch { fatalError(error.localizedDescription) }
         
         try user.join(team: team)
         
@@ -59,13 +65,16 @@ class UserTest: XCTestCase {
         let role = RoleBuilder().build()
         try role.save()
         
-        let user = UserBuilder().build()
-        try user.save()
+        let user = UserBuilder().build {
+            $0.uniqueUsername()
+        }
+        
+        do { try user.save() } catch { fatalError(error.localizedDescription) }
         
         try user.assign(role: role)
         
         let query = try RoleAssignment.makeQuery().filter("userid", user.id)
-                                                  .filter("roleid", role.id)
+            .filter("roleid", role.id)
         
         XCTAssertNotNil(try query.first(), "role_assignment not created")
     }

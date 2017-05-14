@@ -37,6 +37,10 @@ extension Builder {
 final class UserBuilder: Builder {
     
     typealias T = User
+    
+    func uniqueUsername() {
+        self.username = UUID().uuidString
+    }
 
     var username: String = "anyUsername"
     var password: String = "anyPassword"
