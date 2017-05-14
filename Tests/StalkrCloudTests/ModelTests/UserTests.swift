@@ -36,7 +36,7 @@ class UserTest: XCTestCase {
             $0.uniqueUsername()
         }
         
-        do { try user.save() } catch { fatalError(error.localizedDescription) }
+        try user.save()
         
         XCTAssert(user.exists, "user not saved")
     }
@@ -50,7 +50,7 @@ class UserTest: XCTestCase {
             $0.uniqueUsername()
         }
         
-        do { try user.save() } catch { fatalError(error.localizedDescription) }
+        try user.save()
         
         try user.join(team: team)
         
@@ -69,7 +69,7 @@ class UserTest: XCTestCase {
             $0.uniqueUsername()
         }
         
-        do { try user.save() } catch { fatalError(error.localizedDescription) }
+        try user.save()
         
         try user.assign(role: role)
         
