@@ -31,7 +31,7 @@ class TeamController {
     
     func create(request: Request) throws -> ResponseRepresentable {
         
-        guard let name = request.data["name"]?.string else {
+        guard let name = request.headers["name"]?.string else {
             throw Abort(Status.badRequest, metadata: "Missing name")
         }
         
@@ -43,7 +43,7 @@ class TeamController {
     
     func memberships(request: Request) throws -> ResponseRepresentable {
         
-        guard let teamid = request.data["teamid"]?.uint else {
+        guard let teamid = request.headers["teamid"]?.uint else {
             throw Abort(Status.badRequest, metadata: "Missing teamid")
         }
         

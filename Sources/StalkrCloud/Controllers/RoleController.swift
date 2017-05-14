@@ -35,7 +35,7 @@ class RoleController {
     }
     
     func assignments(request: Request) throws -> ResponseRepresentable {
-        if let userid = request.data["userid"]?.uint {
+        if let userid = request.headers["userid"]?.uint {
             guard let _ = try User.find(userid) else {
                 throw Abort(Status.badRequest, metadata: "invalid userid")
             }
@@ -49,11 +49,11 @@ class RoleController {
     }
     
     func assign(request: Request) throws -> ResponseRepresentable {
-        guard let roleid = request.data["roleid"]?.uint else {
+        guard let roleid = request.headers["roleid"]?.uint else {
             throw Abort(Status.badRequest, metadata: "Missing roleid")
         }
         
-        guard let userid = request.data["userid"]?.uint else {
+        guard let userid = request.headers["userid"]?.uint else {
             throw Abort(Status.badRequest, metadata: "Missing userid")
         }
         

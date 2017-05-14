@@ -32,11 +32,11 @@ class UserController {
     
     func register(request: Request) throws -> ResponseRepresentable {
         
-        guard let username = request.data["username"]?.string else {
+        guard let username = request.headers["username"]?.string else {
             throw Abort(Status.badRequest, metadata: "Missing username or password")
         }
         
-        guard let password = request.data["password"]?.string else {
+        guard let password = request.headers["password"]?.string else {
             throw Abort(Status.badRequest, metadata: "Missing username or password")
         }
         
@@ -55,11 +55,11 @@ class UserController {
     
     func login(request: Request) throws -> ResponseRepresentable {
         
-        guard let username = request.data["username"]?.string else {
+        guard let username = request.headers["username"]?.string else {
             throw Abort(Status.badRequest, metadata: "Missing username or password")
         }
         
-        guard let password = request.data["password"]?.string else {
+        guard let password = request.headers["password"]?.string else {
             throw Abort(Status.badRequest, metadata: "Missing username or password")
         }
         
@@ -74,7 +74,7 @@ class UserController {
     
     func jointeam(request: Request) throws -> ResponseRepresentable {
         
-        guard let teamid = request.data["teamid"]?.uint else {
+        guard let teamid = request.headers["teamid"]?.uint else {
             throw Abort(Status.badRequest, metadata: "Missing teamid")
         }
         
