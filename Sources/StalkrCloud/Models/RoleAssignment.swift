@@ -43,20 +43,20 @@ extension RoleAssignment: Preparation {
     
     static func prepare(_ database: Database) throws {
         
-        try database.create(self) { users in
+        try database.create(self) { c in
             
-            users.id()
+            c.id()
             
             let roleid = Field(name: "roleid", type: .int, optional: false,
                                unique: false, default: nil, primaryKey: true)
             let userid = Field(name: "userid", type: .int, optional: false,
                                unique: false, default: nil, primaryKey: true)
             
-            users.field(roleid)
-            users.field(userid)
+            c.field(roleid)
+            c.field(userid)
 
-            users.foreignKey(foreignIdKey: "roleid", referencesIdKey: "id", on: Role.self, name: nil)
-            users.foreignKey(foreignIdKey: "userid", referencesIdKey: "id", on: User.self, name: nil)
+            c.foreignKey(foreignIdKey: "roleid", referencesIdKey: "id", on: Role.self, name: nil)
+            c.foreignKey(foreignIdKey: "userid", referencesIdKey: "id", on: User.self, name: nil)
         }
     }
     
@@ -88,7 +88,7 @@ extension RoleAssignment: JSONConvertible {
 
 extension RoleAssignment {
     func user() throws -> User? {
-        return try User.makeQuery().filter("id", userid).all().first
+        return try User.find(userid)
     }
 }
 
@@ -96,6 +96,6 @@ extension RoleAssignment {
 
 extension RoleAssignment {
     func role() throws -> Role? {
-        return try Role.makeQuery().filter("id", roleid).all().first
+        return try Role.find(roleid)
     }
 }

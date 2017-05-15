@@ -49,29 +49,39 @@ class RoleController {
     }
     
     func assign(request: Request) throws -> ResponseRepresentable {
-        guard let roleid = request.headers["roleid"]?.uint else {
+        guard let _roleid = request.headers["roleid"]?.uint else {
             throw Abort(Status.badRequest, metadata: "Missing roleid")
         }
         
-        guard let userid = request.headers["userid"]?.uint else {
-            throw Abort(Status.badRequest, metadata: "Missing userid")
-        }
-        
-        guard let role = try Role.makeQuery().filter("id", roleid).first() else {
+        guard let role = try Role.find(_roleid),
+              let roleid = role.id else {
             throw Abort(Status.badRequest, metadata: "Role does not exist")
         }
         
-        guard let user = try User.makeQuery().filter("id", userid).first() else {
+        guard let _userid = request.headers["userid"]?.uint else {
+            throw Abort(Status.badRequest, metadata: "Missing userid")
+        }
+        
+        guard let user = try User.find(_userid),
+              let userid = user.id else {
             throw Abort(Status.badRequest, metadata: "User does not exist")
         }
         
-        if try RoleAssignment.makeQuery().filter("roleid", roleid).filter("userid", userid).first() != nil {
+        if try RoleAssignment.first(with: [("roleid", roleid),
+                                           ("userid", userid)]) != nil {
             throw Abort(Status.badRequest, metadata: "This Role Assignment is already in place")
         }
         
-        guard try user.assign(role: role) else {
+        let _assignment = RoleAssignmentBuilder.build {
+            $0.roleid = roleid
+            $0.userid = userid
+        }
+        
+        guard let assignment = _assignment else {
             throw Abort(Status.badRequest, metadata: "Could not assign role")
         }
+        
+        try assignment.save()
         
         return JSON(["success": true])
     }

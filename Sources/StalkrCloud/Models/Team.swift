@@ -55,9 +55,9 @@ final class Team: Model {
 extension Team: Preparation {
     
     static func prepare(_ database: Database) throws {
-        try database.create(self) { users in
-            users.id()
-            users.string("name")
+        try database.create(self) { c in
+            c.id()
+            c.string("name")
         }
     }
     
@@ -70,6 +70,6 @@ extension Team: Preparation {
 
 extension Team {
     func memberships() throws -> [TeamMembership] {
-        return try TeamMembership.makeQuery().filter("teamid", id).all()
+        return try TeamMembership.all(with: [("teamid", id)])
     }
 }

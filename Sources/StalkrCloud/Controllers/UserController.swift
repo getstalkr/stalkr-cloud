@@ -9,6 +9,7 @@
 import HTTP
 import Vapor
 import Foundation
+import MoreFluent
 
 class UserController {
     
@@ -40,11 +41,11 @@ class UserController {
             throw Abort(Status.badRequest, metadata: "Missing username or password")
         }
         
-        if let _ = try User.makeQuery().filter("username", username).first() {
+        if let _ = try User.first(with: [("username", username)]) {
             throw Abort(Status.badRequest, metadata: "Username already in use")
         }
         
-        let user = try User(name: username, password: password)
+        let user = User(name: username, password: password)
         
         try user.save()
         
@@ -60,8 +61,9 @@ class UserController {
         guard let password = request.headers["password"]?.string else {
             throw Abort(Status.badRequest, metadata: "Missing username or password")
         }
-        
-        guard let user = try User.makeQuery().filter("username", username).filter("password", password).first() else {
+
+        guard let user = try User.first(with: [("username", username),
+                                               ("password", password)]) else {
             throw Abort(Status.badRequest, metadata: "Wrong username or password")
         }
         
@@ -72,11 +74,12 @@ class UserController {
     
     func jointeam(request: Request) throws -> ResponseRepresentable {
         
-        guard let teamid = request.headers["teamid"]?.uint else {
+        guard let _teamid = request.headers["teamid"]?.uint else {
             throw Abort(Status.badRequest, metadata: "Missing teamid")
         }
         
-        guard let team = try Team.makeQuery().filter("id", teamid).first() else {
+        guard let team = try Team.first(with: [("id", _teamid)]),
+              let teamid = team.id else {
             throw Abort(Status.badRequest, metadata: "Team does not exist")
         }
         
@@ -84,13 +87,21 @@ class UserController {
             throw Abort(Status.badRequest, metadata: "No user")
         }
         
-        if try TeamMembership.makeQuery().filter("teamid", teamid).filter("userid", userid).first() != nil {
+        if try TeamMembership.first(with: [("teamid", teamid),
+                                           ("userid", userid)]) != nil {
             throw Abort(Status.badRequest, metadata: "This Team Membership already exists")
         }
         
-        guard try user.join(team: team) else {
-            throw Abort(Status.badRequest, metadata: "Could not join team")
+        let _membership = TeamMembershipBuilder().build {
+            $0.teamid = teamid
+            $0.userid = userid
         }
+        
+        guard let membership = _membership else {
+            throw Abort(Status.badRequest, metadata: "Team Membership could not be established")
+        }
+        
+        try membership.save()
         
         return JSON(["success": true])
     }

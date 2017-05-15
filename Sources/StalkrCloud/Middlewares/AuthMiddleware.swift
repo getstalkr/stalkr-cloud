@@ -29,11 +29,14 @@ class AuthMiddleware: Middleware {
             throw Abort(Status.badRequest, metadata: "missing token")
         }
         
-        guard let user = try User.makeQuery().filter("token", token).first() else {
+        guard let user = try User.first(with: [("token", token)]),
+              let userid = user.id else {
             throw Abort(Status.badRequest, metadata: "invalid token")
         }
         
-        guard roleNames.isSubset(of: try user.assignments().map { try $0.role()! }.map { $0.name }) else {
+        let assignments = try RoleAssignment.all(with: [("userid", userid)])
+        
+        guard roleNames.isSubset(of: try assignments.map { try $0.role()! }.map { $0.name }) else {
             throw Abort(Status.unauthorized, metadata: "unauthorized")
         }
         

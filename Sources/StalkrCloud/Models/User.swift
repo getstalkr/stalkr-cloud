@@ -52,7 +52,7 @@ final class User: Model {
     }
     
     class func withName(_ name: String) throws -> User? {
-        return try User.makeQuery().filter("username", name).first()
+        return try User.first(with: [("username", name)])
     }
 }
 
@@ -62,57 +62,15 @@ extension User: Preparation {
     
     static func prepare(_ database: Database) throws {
         
-        try database.create(self) { users in
-            users.id()
-            users.string("username", length: nil, optional: false, unique: true, default: nil)
-            users.string("password")
-            users.string("token", length: nil, optional: true, unique: false, default: nil)
+        try database.create(self) { c in
+            c.id()
+            c.string("username", length: nil, optional: false, unique: true, default: nil)
+            c.string("password")
+            c.string("token", length: nil, optional: true, unique: false, default: nil)
         }
     }
     
     static func revert(_ database: Database) throws {
         try database.delete(self)
-    }
-}
-
-// MARK: Roles
-
-extension User {
-    func assignments() throws -> [RoleAssignment] {
-        return try RoleAssignment.makeQuery().filter("userid", id).all()
-    }
-    
-    func assign(role: Role) throws -> Bool {
-        
-        guard let roleid = role.id, let userid = self.id else {
-            return false
-        }
-        
-        let assignment = RoleAssignment(roleid: roleid, userid: userid)
-        
-        try assignment.save()
-        
-        return true
-    }
-}
-
-// MARK: Teams
-
-extension User {
-    func memberships() throws -> [TeamMembership] {
-        return try TeamMembership.makeQuery().filter("userid", id).all()
-    }
-    
-    func join(team: Team) throws -> Bool {
-        
-        guard let teamid = team.id, let userid = self.id else {
-            return false
-        }
-        
-        let membership = TeamMembership(teamid: teamid, userid: userid)
-        
-        try membership.save()
-        
-        return true
     }
 }

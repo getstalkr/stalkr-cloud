@@ -47,7 +47,7 @@ class TeamController {
             throw Abort(Status.badRequest, metadata: "Missing teamid")
         }
         
-        let memberships = try TeamMembership.makeQuery().filter("teamid", teamid).all()
+        let memberships = try TeamMembership.all(with: [("teamid", teamid)])
         
         return try JSON(node: memberships)
     }

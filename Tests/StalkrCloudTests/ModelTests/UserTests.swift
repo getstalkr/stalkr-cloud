@@ -44,9 +44,14 @@ class UserTest: XCTestCase {
         
         try user.save()
         
-        _ = try user.join(team: team)
+        try TeamMembershipBuilder.build {
+            $0.teamid = team.id
+            $0.userid = user.id
+        }?.save()
         
-        XCTAssertNotNil(try user.memberships().count == 1, "team_membership not saved")
+        let membership = try TeamMembership.first(with: [("userid", user.id)])
+        
+        XCTAssertNotNil(membership, "team_membership not saved")
     }
     
     func testThatUserAssignsRole() throws {
@@ -60,9 +65,15 @@ class UserTest: XCTestCase {
         
         try user.save()
         
-        _ = try user.assign(role: role)
+        try RoleAssignmentBuilder.build {
+            $0.roleid = role.id
+            $0.userid = user.id
+        }?.save()
         
-        XCTAssert(try user.assignments().count == 1, "role_assignment not saved")
+        let assignment = try RoleAssignment.first(with: [("userid", user.id),
+                                                         ("roleid", role.id)])
+        
+        XCTAssertNotNil(assignment, "role_assignment not saved")
     }
     
     func testThatUserCreatesToken() throws {

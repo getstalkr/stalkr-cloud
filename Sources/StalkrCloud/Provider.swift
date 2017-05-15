@@ -53,9 +53,21 @@ public class Provider: Vapor.Provider {
         
         if let db = drop.database {
             
-            try User(name: "admin", password: "123456").save()
-            try User.withName("admin")?.assign(role: try Role.withName("user")!)
-            try User.withName("admin")?.assign(role: try Role.withName("admin")!)
+            let admin = User(name: "admin", password: "123456")
+            
+            try admin.save()
+            
+            let adminRoleId = try Role.withName("admin")?.id
+            try RoleAssignmentBuilder().build {
+                $0.roleid = adminRoleId
+                $0.userid = admin.id
+            }?.save()
+            
+            let userRoleId = try Role.withName("user")?.id
+            try RoleAssignmentBuilder().build {
+                $0.roleid = userRoleId
+                $0.userid = admin.id
+            }?.save()
         }
         
         // Init Controllers
@@ -63,7 +75,7 @@ public class Provider: Vapor.Provider {
         let roleController = RoleController(drop: drop)
         let teamController = TeamController(drop: drop)
         let userController = UserController(drop: drop)
-        
+
         // Add Routes
         
         roleController.addRoutes()

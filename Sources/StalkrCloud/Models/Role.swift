@@ -39,7 +39,7 @@ final class Role: Model {
     }
     
     class func withName(_ name: String) throws -> Role? {
-        return try Role.makeQuery().filter("name", name).first()
+        return try Role.first(with: [("name", name)])
     }
 }
 
@@ -48,10 +48,10 @@ final class Role: Model {
 extension Role: Preparation {
     
     static func prepare(_ database: Database) throws {
-        try database.create(self) { roles in
-            roles.id()
-            roles.string("name", length: nil, optional: false, unique: true, default: nil)
-            roles.string("readable_name")
+        try database.create(self) { c in
+            c.id()
+            c.string("name", length: nil, optional: false, unique: true, default: nil)
+            c.string("readable_name")
         }
         
         try Role(name: "admin", readableName: "Admin").save()

@@ -44,24 +44,54 @@ extension TeamMembership: Preparation {
     
     static func prepare(_ database: Database) throws {
         
-        try database.create(self) { users in
+        try database.create(self) { c in
             
-            users.id()
+            c.id()
             
             let teamid = Field(name: "teamid", type: .int, optional: false,
                                unique: false, default: nil, primaryKey: true)
             let userid = Field(name: "userid", type: .int, optional: false,
                                unique: false, default: nil, primaryKey: true)
         
-            users.field(teamid)
-            users.field(userid)
+            c.field(teamid)
+            c.field(userid)
             
-            users.foreignKey(foreignIdKey: "teamid", referencesIdKey: "id", on: Team.self, name: nil)
-            users.foreignKey(foreignIdKey: "userid", referencesIdKey: "id", on: User.self, name: nil)
+            c.foreignKey(foreignIdKey: "teamid", referencesIdKey: "id", on: Team.self, name: nil)
+            c.foreignKey(foreignIdKey: "userid", referencesIdKey: "id", on: User.self, name: nil)
         }
     }
     
     static func revert(_ database: Database) throws {
         try database.delete(self)
+    }
+}
+
+// MARK: JSONRepresentable
+
+extension TeamMembership: JSONRepresentable {
+    func makeJSON() throws -> JSON {
+        var json = JSON()
+        
+        try json.set("id", self.id)
+        try json.set("teamid", self.teamid)
+        try json.set("userid", self.userid)
+        
+        return json
+    }
+}
+
+// MARK: Team
+
+extension TeamMembership {
+    func team() throws -> Team? {
+        return try Team.find(teamid)
+    }
+}
+
+// MARK: User
+
+extension TeamMembership {
+    func user() throws -> User? {
+        return try User.find(userid)
     }
 }
