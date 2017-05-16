@@ -33,7 +33,7 @@ class UserControllerTest: XCTestCase {
         
         _ = try drop.respond(to: req)
         
-        let user = try User.makeQuery().filter("username", username).first()
+        let user = try User.first(with: [("username", username)])
         
         XCTAssertNotNil(user, "user not registered")
     }
@@ -47,7 +47,7 @@ class UserControllerTest: XCTestCase {
         
         _ = try drop.respond(to: req)
         
-        let user = try User.makeQuery().filter("username", username).first()
+        let user = try User.first(with: [("username", username)])
         
         XCTAssertNil(user, "user registered")
     }
@@ -61,7 +61,7 @@ class UserControllerTest: XCTestCase {
         
         _ = try drop.respond(to: req)
         
-        let user = try User.makeQuery().filter("username", "").first()
+        let user = try User.first(with: [("username", "")])
         
         XCTAssertNil(user, "user registered")
     }
@@ -78,8 +78,8 @@ class UserControllerTest: XCTestCase {
         _ = try drop.respond(to: req)
         _ = try drop.respond(to: req)
         
-        let users = try User.makeQuery().filter("username", username)
+        let users = try User.all(with: [("username", username)])
         
-        XCTAssert(try users.count() == 1, "user registered")
+        XCTAssert(users.count == 1, "user registered")
     }
 }

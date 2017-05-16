@@ -25,7 +25,7 @@ class AuthMiddleware: Middleware {
     
     func respond(to request: Request, chainingTo next: Responder) throws -> Response {
         
-        guard let token = request.data["token"]?.string else {
+        guard let token = request.headers["token"]?.string else {
             throw Abort(Status.badRequest, metadata: "missing token")
         }
         

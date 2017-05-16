@@ -40,7 +40,7 @@ class RoleController {
                 throw Abort(Status.badRequest, metadata: "invalid userid")
             }
             
-            let assignments = try RoleAssignment.makeQuery().filter("userid", userid).all()
+            let assignments = try RoleAssignment.all(with: [("userid", userid)])
             
             return try assignments.makeJSON()
         }
