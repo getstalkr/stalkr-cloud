@@ -82,16 +82,16 @@ extension TeamMembership: JSONRepresentable {
 
 // MARK: Team
 
-extension TeamMembership {
+/*extension TeamMembership {
     func team() throws -> Team? {
         return try Team.find(teamid)
     }
-}
+}*/
 
 // MARK: User
 
-extension TeamMembership {
+/*extension TeamMembership {
     func user() throws -> User? {
         return try User.find(userid)
     }
-}
+}*/

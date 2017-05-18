@@ -71,15 +71,17 @@ public class Provider: Vapor.Provider {
         }
         
         // Init Controllers
-        
-        let roleController = RoleController(drop: drop)
-        let teamController = TeamController(drop: drop)
         let userController = UserController(drop: drop)
+        let teamController = TeamController(drop: drop)
+        let roleController = RoleController(drop: drop)
+        
+        let teamMembershipController = TeamMembershipController(drop: drop)
 
         // Add Routes
-        
-        roleController.addRoutes()
-        teamController.addRoutes()
         userController.addRoutes()
+        teamController.addRoutes()
+        roleController.addRoutes()
+        
+        teamMembershipController.addRoutes()
     }
 }

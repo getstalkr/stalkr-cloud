@@ -20,12 +20,9 @@ class TeamController {
     
     func addRoutes() {
         drop.group("team") { team in
-            
             team.group(AuthMiddleware.user) { authTeam in
                 authTeam.post("create", handler: create)
             }
-            
-            team.get("memberships", handler: memberships)
         }
     }
     
@@ -39,16 +36,5 @@ class TeamController {
         try team.save()
         
         return JSON(["success": true])
-    }
-    
-    func memberships(request: Request) throws -> ResponseRepresentable {
-        
-        guard let teamid = request.headers["teamid"]?.uint else {
-            throw Abort(Status.badRequest, metadata: "Missing teamid")
-        }
-        
-        let memberships = try TeamMembership.all(with: [("teamid", teamid)])
-        
-        return try JSON(node: memberships)
     }
 }

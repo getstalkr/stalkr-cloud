@@ -65,11 +65,3 @@ extension Team: Preparation {
         try database.delete(self)
     }
 }
-
-// TeamMemberships
-
-extension Team {
-    func memberships() throws -> [TeamMembership] {
-        return try TeamMembership.all(with: [("teamid", id)])
-    }
-}
