@@ -132,11 +132,49 @@ class TeamMembershipControllerTest: XCTestCase {
         
         try memberships.forEach { try $0?.save() }
         
+        let team = teams[2]
+        
         let req = Request(method: .get, uri: "/teammembership/team/")
-        req.headers["id"] = teams[2].id?.string
+        req.headers["id"] = team.id?.string
         
         let res = try drop.respond(to: req)
         
-        XCTAssert(try res.body.bytes! == TeamMembership.all(with: [("teamid", teams[2].id)]).makeJSON().makeResponse().body.bytes!)
+        XCTAssert(try res.body.bytes! == TeamMembership.all(with: [("teamid", team.id)]).makeJSON().makeResponse().body.bytes!)
+    }
+    
+    func testTeamMembershipUser() throws {
+        let prefix = "testTeamMembershipUser"
+        
+        let users = UserBuilder.build(4) {
+            $0.username = "\(prefix)_username_\($1)"
+        }
+        try users.forEach { try $0.save() }
+        
+        let teams = TeamBuilder.build(4) {
+            $0.name = prefix + "\(prefix)_name_\($1)"
+        }
+        try teams.forEach { try $0.save() }
+        
+        
+        
+        let memberships = teams.map { t in
+            users.map { u in
+                TeamMembershipBuilder.build { b in
+                    b.teamid = t.id
+                    b.userid = u.id
+                }
+            }
+            }.flatMap {$0}
+        
+        try memberships.forEach { try $0?.save() }
+        
+        let user = users[2]
+        
+        let req = Request(method: .get, uri: "/teammembership/user/")
+        req.headers["id"] = user.id?.string
+        
+        let res = try drop.respond(to: req)
+        
+        XCTAssert(try res.body.bytes! == TeamMembership.all(with: [("userid", user.id)]).makeJSON().makeResponse().body.bytes!)
     }
 }
