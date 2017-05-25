@@ -38,48 +38,37 @@ class UserControllerTest: XCTestCase {
         XCTAssertNotNil(user, "user not registered")
     }
     
-    func testUserRegisterWithoutPassword() throws {
+    func testUserLogin() throws {
+        let prefix = "testUserLogin"
+        let user = UserBuilder.build {
+            $0.username = "\(prefix)_username"
+            $0.password = "\(prefix)_password"
+        }
+        try user.save()
         
-        let username = "testUserRegisterWithoutPassword_username"
+        let req = Request(method: .post, uri: "/user/login")
+        req.headers["username"] = user.username
+        req.headers["password"] = user.password
         
-        let req = Request(method: .post, uri: "/user/register/")
-        req.headers["username"] = username
-        
-        _ = try drop.respond(to: req)
-        
-        let user = try User.first(with: [("username", username)])
-        
-        XCTAssertNil(user, "user registered")
+        let res = try drop.respond(to: req)
+
+        XCTAssert(res.json?["success"] == true)
     }
     
-    func testUserRegisterWithoutUsername() throws {
+    func testUserLoginError() throws {
+        let prefix = "testUserLoginError"
+        let user = UserBuilder.build {
+            $0.username = "\(prefix)_username"
+            $0.password = "\(prefix)_password"
+        }
+        try user.save()
         
-        let password = "testUserRegisterWithoutPassword_password"
+        let req = Request(method: .post, uri: "/user/login")
+        req.headers["username"] = user.username
+        req.headers["password"] = "wrong"
         
-        let req = Request(method: .post, uri: "/user/register/")
-        req.headers["password"] = password
+        let res = try drop.respond(to: req)
         
-        _ = try drop.respond(to: req)
-        
-        let user = try User.first(with: [("username", "")])
-        
-        XCTAssertNil(user, "user registered")
-    }
-    
-    func testUserRegisterWithRepeatedUsername() throws {
-            
-        let username = "testUserRegister_username"
-        let password = "testUserRegister_password"
-        
-        let req = Request(method: .post, uri: "/user/register/")
-        req.headers["username"] = username
-        req.headers["password"] = password
-        
-        _ = try drop.respond(to: req)
-        _ = try drop.respond(to: req)
-        
-        let users = try User.all(with: [("username", username)])
-        
-        XCTAssert(users.count == 1, "user registered")
+        XCTAssert(res.json?["success"] == false)
     }
 }

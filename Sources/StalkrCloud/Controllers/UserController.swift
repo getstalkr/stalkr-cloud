@@ -31,10 +31,6 @@ class UserController {
         let username = try request.value(for: "username")
         let password = try request.value(for: "password")
         
-        if let _ = try User.first(with: [("username", username)]) {
-            throw Abort(Status.badRequest, metadata: "Username already in use")
-        }
-        
         let user = User(name: username, password: password)
         
         try user.save()
@@ -49,7 +45,7 @@ class UserController {
 
         guard let user = try User.first(with: [("username", username),
                                                ("password", password)]) else {
-            throw Abort(Status.badRequest, metadata: "Wrong username or password")
+            return try JSON(node: ["success": false, "error": "wrong username or password"])
         }
         
         let token = try user.createToken()
