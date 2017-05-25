@@ -15,22 +15,39 @@ protocol Builder {
     associatedtype T
     
     typealias BuilderClosure = (Self) -> ()
+    typealias BuilderClosureN = (Self, UInt) -> ()
     
     init()
     
     static func build(buildClosure: BuilderClosure?) -> T
     func build(buildClosure: BuilderClosure?) -> T
     
+    static func build(_ quantity: UInt, buildClosure: BuilderClosureN?) -> [T]
+    func build(_ quantity: UInt, buildClosure: BuilderClosureN?) -> [T]
+    
     func finish() -> T
 }
 
 extension Builder {
+    
     static func build(buildClosure: BuilderClosure? = nil) -> T {
         return Self().build(buildClosure: buildClosure)
     }
     func build(buildClosure: BuilderClosure? = nil) -> T {
         buildClosure?(self)
         return finish()
+    }
+    
+    static func build(_ quantity: UInt, buildClosure: BuilderClosureN? = nil) -> [T] {
+        return Self().build(quantity, buildClosure: buildClosure)
+    }
+    
+    func build(_ quantity: UInt, buildClosure: BuilderClosureN? = nil) -> [T] {
+        let range = (0 as UInt...quantity)
+        return range.map { (i: UInt) -> T in
+            buildClosure?(self, i)
+            return finish()
+        }
     }
 }
 

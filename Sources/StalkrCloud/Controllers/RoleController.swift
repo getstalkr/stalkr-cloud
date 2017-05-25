@@ -24,9 +24,8 @@ class RoleController {
             role.get("roles", handler: roles)
             role.get("assignments", handler: assignments)
             
-            role.group(AuthMiddleware.admin) { authAdmin in
-                authAdmin.post("assign", handler: assign)
-            }
+            let admin = role.grouped(AuthMiddleware.admin)
+            admin.get("assign", handler: assign)
         }
     }
     
@@ -49,32 +48,22 @@ class RoleController {
     }
     
     func assign(request: Request) throws -> ResponseRepresentable {
-        guard let _roleid = request.headers["roleid"]?.uint else {
-            throw Abort(Status.badRequest, metadata: "Missing roleid")
+        guard let user = try User.find(request.value(for: "userid")) else {
+            throw Abort(Status.badRequest, metadata: "user not found")
         }
         
-        guard let role = try Role.find(_roleid),
-              let roleid = role.id else {
-            throw Abort(Status.badRequest, metadata: "Role does not exist")
+        guard let role = try Role.find(request.value(for: "roleid")) else {
+            throw Abort(Status.badRequest, metadata: "role not found")
         }
         
-        guard let _userid = request.headers["userid"]?.uint else {
-            throw Abort(Status.badRequest, metadata: "Missing userid")
-        }
-        
-        guard let user = try User.find(_userid),
-              let userid = user.id else {
-            throw Abort(Status.badRequest, metadata: "User does not exist")
-        }
-        
-        if try RoleAssignment.first(with: [("roleid", roleid),
-                                           ("userid", userid)]) != nil {
+        if try RoleAssignment.first(with: [("roleid", role.id),
+                                           ("userid", user.id)]) != nil {
             throw Abort(Status.badRequest, metadata: "This Role Assignment is already in place")
         }
         
         let _assignment = RoleAssignmentBuilder.build {
-            $0.roleid = roleid
-            $0.userid = userid
+            $0.roleid = role.id
+            $0.userid = user.id
         }
         
         guard let assignment = _assignment else {

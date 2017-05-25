@@ -28,13 +28,8 @@ class UserController {
     
     func register(request: Request) throws -> ResponseRepresentable {
         
-        guard let username = request.headers["username"]?.string else {
-            throw Abort(Status.badRequest, metadata: "Missing username or password")
-        }
-        
-        guard let password = request.headers["password"]?.string else {
-            throw Abort(Status.badRequest, metadata: "Missing username or password")
-        }
+        let username = try request.value(for: "username")
+        let password = try request.value(for: "password")
         
         if let _ = try User.first(with: [("username", username)]) {
             throw Abort(Status.badRequest, metadata: "Username already in use")
@@ -49,13 +44,8 @@ class UserController {
     
     func login(request: Request) throws -> ResponseRepresentable {
         
-        guard let username = request.headers["username"]?.string else {
-            throw Abort(Status.badRequest, metadata: "Missing username or password")
-        }
-        
-        guard let password = request.headers["password"]?.string else {
-            throw Abort(Status.badRequest, metadata: "Missing username or password")
-        }
+        let username = try request.value(for: "username")
+        let password = try request.value(for: "password")
 
         guard let user = try User.first(with: [("username", username),
                                                ("password", password)]) else {
