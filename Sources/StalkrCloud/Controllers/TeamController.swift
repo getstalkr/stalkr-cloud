@@ -28,9 +28,7 @@ class TeamController {
     
     func create(request: Request) throws -> ResponseRepresentable {
         
-        guard let name = request.headers["name"]?.string else {
-            throw Abort(Status.badRequest, metadata: "Missing name")
-        }
+        let name = try request.value(for: "name")
         
         let team = Team(name: name)
         try team.save()
