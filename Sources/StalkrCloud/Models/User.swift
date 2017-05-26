@@ -50,10 +50,6 @@ final class User: Model {
         try self.save()
         return token
     }
-    
-    class func withName(_ name: String) throws -> User? {
-        return try User.first(with: [("username", name)])
-    }
 }
 
 // MARK: Preparations
