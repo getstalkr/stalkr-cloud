@@ -13,13 +13,7 @@ import XCTest
 import Foundation
 import Vapor
 
-class RoleControllerTests: XCTestCase {
-    
-    var drop: Droplet!
-    
-    override func setUp() {
-        drop = Droplet.test
-    }
+class RoleControllerTests: ControllerTest {
     
     func testRoleAll() throws {
         let prefix = "testRoleAll"

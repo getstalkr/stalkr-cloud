@@ -14,13 +14,7 @@ import HTTP
 import FluentProvider
 import JWT
 
-class UserControllerTest: XCTestCase {
-    
-    private var drop: Droplet!
-    
-    override func setUp() {
-        drop = Droplet.test
-    }
+class UserControllerTest: ControllerTest {
     
     func testUserRegister() throws {
         

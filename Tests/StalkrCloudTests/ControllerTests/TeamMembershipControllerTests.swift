@@ -13,13 +13,7 @@ import XCTest
 import Foundation
 import Vapor
 
-class TeamMembershipControllerTest: XCTestCase {
-    
-    private var drop: Droplet!
-    
-    override func setUp() {
-        drop = Droplet.test
-    }
+class TeamMembershipControllerTest: ControllerTest {
     
     func testTeamMembershipCreate() throws {
         let prefix = "testTeamMembershipCreate_"

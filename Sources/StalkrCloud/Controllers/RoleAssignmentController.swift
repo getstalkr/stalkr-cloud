@@ -20,9 +20,8 @@ class RoleAssignmentController {
     }
     
     func addRoutes() {
-        drop.group("roleassignment") { 
+        drop.group("roleassignment") {
             $0.get("all", handler: all)
-            
             $0.get("role", handler: role)
             $0.get("user", handler: user)
             

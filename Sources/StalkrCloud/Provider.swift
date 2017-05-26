@@ -76,6 +76,7 @@ public class Provider: Vapor.Provider {
         let roleController = RoleController(drop: drop)
         
         let teamMembershipController = TeamMembershipController(drop: drop)
+        let roleAssignmentController = RoleAssignmentController(drop: drop)
 
         // Add Routes
         userController.addRoutes()
@@ -83,5 +84,6 @@ public class Provider: Vapor.Provider {
         roleController.addRoutes()
         
         teamMembershipController.addRoutes()
+        roleAssignmentController.addRoutes()
     }
 }
