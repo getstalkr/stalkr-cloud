@@ -16,6 +16,12 @@ import JWT
 
 class UserControllerTest: ControllerTest {
     
+    static var allTests = [
+        ("testUserRegister", testUserRegister),
+        ("testUserLogin", testUserLogin),
+        ("testUserLoginError", testUserLoginError)
+    ]
+    
     func testUserRegister() throws {
         
         let username = "testUserRegister_username"

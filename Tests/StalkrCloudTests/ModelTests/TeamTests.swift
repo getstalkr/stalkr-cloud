@@ -16,6 +16,10 @@ import JWT
 
 class TeamTest: XCTestCase {
     
+    static var allTests = [
+        ("testThatTeamExists", testThatTeamExists)
+    ]
+    
     private var drop: Droplet!
     
     override func setUp() {

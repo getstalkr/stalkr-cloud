@@ -15,6 +15,10 @@ import Vapor
 
 class RoleControllerTests: ControllerTest {
     
+    static var allTests = [
+        ("testRoleAll", testRoleAll)
+    ]
+    
     func testRoleAll() throws {
         let prefix = "testRoleAll"
         

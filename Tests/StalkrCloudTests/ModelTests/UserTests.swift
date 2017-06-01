@@ -16,6 +16,13 @@ import JWT
 
 class UserTest: XCTestCase {
     
+    static var allTests = [
+        ("testThatUserExists", testThatUserExists),
+        ("testThatUserJoinsTeam", testThatUserJoinsTeam),
+        ("testThatUserAssignsRole", testThatUserAssignsRole),
+        ("testThatUserCreatesToken", testThatUserCreatesToken)
+    ]
+    
     private var drop: Droplet!
     
     override func setUp() {

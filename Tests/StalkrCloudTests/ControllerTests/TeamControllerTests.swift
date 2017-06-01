@@ -15,6 +15,12 @@ import Vapor
 
 class TeamControllerTest: ControllerTest {
     
+    static var allTests = [
+        ("testTeamCreate", testTeamCreate),
+        ("testTeamCreateWithoutAccessToken", testTeamCreateWithoutAccessToken),
+        ("testTeamCreateWithoutUserRole", testTeamCreateWithoutUserRole)
+    ]
+    
     func testTeamCreate() throws {
         let prefix = "testTeamCreate_"
         

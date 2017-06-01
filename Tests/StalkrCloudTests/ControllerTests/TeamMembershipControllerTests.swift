@@ -15,6 +15,13 @@ import Vapor
 
 class TeamMembershipControllerTest: ControllerTest {
     
+    static var allTests = [
+        ("testTeamMembershipCreate", testTeamMembershipCreate),
+        ("testTeamMembershipAll", testTeamMembershipAll),
+        ("testTeamMembershipTeam", testTeamMembershipTeam),
+        ("testTeamMembershipUser", testTeamMembershipUser)
+    ]
+    
     func testTeamMembershipCreate() throws {
         let prefix = "testTeamMembershipCreate_"
         
