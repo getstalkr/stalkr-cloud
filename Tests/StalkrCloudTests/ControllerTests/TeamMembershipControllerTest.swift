@@ -13,7 +13,7 @@ import XCTest
 import Foundation
 import Vapor
 
-class TeamMembershipControllerTests: ControllerTest {
+class TeamMembershipControllerTest: ControllerTest {
     
     static var allTests = [
         ("testTeamMembershipCreate", testTeamMembershipCreate),
