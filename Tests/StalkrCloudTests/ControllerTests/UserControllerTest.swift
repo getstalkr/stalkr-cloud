@@ -14,7 +14,7 @@ import HTTP
 import FluentProvider
 import JWT
 
-class UserControllerTest: ControllerTest {
+class UserControllerTests: ControllerTest {
     
     static var allTests = [
         ("testUserRegister", testUserRegister),

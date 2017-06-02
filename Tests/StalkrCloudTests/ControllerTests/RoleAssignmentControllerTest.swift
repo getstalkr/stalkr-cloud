@@ -13,7 +13,7 @@ import XCTest
 import Foundation
 import Vapor
 
-class RoleAssignmentControllerTests: ControllerTest {
+class RoleAssignmentControllerTest: ControllerTest {
     
     static var allTests = [
         ("testRoleAssignmentCreate", testRoleAssignmentCreate),
