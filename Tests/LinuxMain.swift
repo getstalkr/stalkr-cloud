@@ -11,11 +11,11 @@ import XCTest
 @testable import StalkrCloudTests
 
 XCTMain([
-    testCase(UserControllerTests.allTests),
-    testCase(TeamControllerTests.allTests),
-    testCase(TeamMembershipControllerTests.allTests),
-    testCase(RoleControllerTests.allTests),
-    testCase(RoleAssignmentControllerTests.allTests),
-    testCase(UserTests.allTests),
-    testCase(TeamTests.allTests)
+    testCase(UserControllerTest.allTests),
+    testCase(TeamControllerTest.allTests),
+    testCase(TeamMembershipControllerTest.allTests),
+    testCase(RoleControllerTest.allTests),
+    testCase(RoleAssignmentControllerTest.allTests),
+    testCase(UserTest.allTests),
+    testCase(TeamTest.allTests)
     ])
