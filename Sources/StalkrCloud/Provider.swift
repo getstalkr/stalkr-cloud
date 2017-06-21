@@ -24,6 +24,7 @@ public class Provider: Vapor.Provider {
         config.preparations.append(TeamMembership.self)
         config.preparations.append(Role.self)
         config.preparations.append(RoleAssignment.self)
+        config.preparations.append(SmartToken.self)
     }
 
     /// This should be the name of the actual repository
@@ -78,6 +79,8 @@ public class Provider: Vapor.Provider {
         
         let teamMembershipController = TeamMembershipController(drop: drop)
         let roleAssignmentController = RoleAssignmentController(drop: drop)
+        
+        let smartTokenController = SmartTokenController(drop: drop)
 
         // Add Routes
         userController.addRoutes()
@@ -86,5 +89,7 @@ public class Provider: Vapor.Provider {
         
         teamMembershipController.addRoutes()
         roleAssignmentController.addRoutes()
+        
+        smartTokenController.addRoutes()
     }
 }
