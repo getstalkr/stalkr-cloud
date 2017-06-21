@@ -7,12 +7,29 @@
 //
 
 import HTTP
+import Vapor
 import Foundation
+import AuthProvider
 
 extension Request {
     
-    var user: User? {
-        get { return storage["user"] as? User }
-        set { return storage["user"] = newValue }
+    func user() throws -> User {
+        return try auth.assertAuthenticated()
+    }
+    
+    func assertBasicAuth() throws -> Password {
+        if let auth = auth.header?.basic {
+            return auth
+        }
+        
+        throw Abort(Status.badRequest, metadata: "missing basic authorization header".makeNode(in: nil))
+    }
+    
+    func assertBearerAuth() throws -> Token {
+        if let auth = auth.header?.bearer {
+            return auth
+        }
+        
+        throw Abort(Status.badRequest, metadata: "missing bearer token".makeNode(in: nil))
     }
 }

@@ -19,6 +19,7 @@ public class Provider: Vapor.Provider {
     /// in the `Config.addProvider` call.
     public func boot(_ config: Config) throws {
         config.preparations.append(User.self)
+        config.preparations.append(UserToken.self)
         config.preparations.append(Team.self)
         config.preparations.append(TeamMembership.self)
         config.preparations.append(Role.self)

@@ -10,6 +10,7 @@ import HTTP
 import Vapor
 import Foundation
 import MoreFluent
+import AuthProvider
 
 class UserController {
     
@@ -20,36 +21,46 @@ class UserController {
     }
     
     func addRoutes() {
-        drop.group("user") { user in
-            user.post("register", handler: register)
-            user.post("login", handler: login)
+        drop.group("user") {
+            $0.post("register", handler: register)
+            $0.post("login", handler: login)
+            
+            let authed = $0.grouped([TokenAuthenticationMiddleware(User.self)])
+            
+            authed.get("me", handler: me)
         }
     }
     
     func register(request: Request) throws -> ResponseRepresentable {
         
-        let username = try request.value(for: "username")
-        let password = try request.value(for: "password")
+        let auth = try request.assertBasicAuth()
         
-        let user = User(name: username, password: password)
+        let user = User(name: auth.username,
+                        password: try auth.password.hashed(by: drop))
         
         try user.save()
         
-        return try JSON(node: ["success": true, "token": try user.createToken()])
+        return user
     }
     
     func login(request: Request) throws -> ResponseRepresentable {
         
-        let username = try request.value(for: "username")
-        let password = try request.value(for: "password")
-
-        guard let user = try User.first(with: [("username", username),
-                                               ("password", password)]) else {
-            return try JSON(node: ["success": false, "error": "wrong username or password"])
-        }
+        let auth = try request.assertBasicAuth()
         
-        let token = try user.createToken()
+        let hashedAuth = Password(username: auth.username,
+                                  password: try auth.password.hashed(by: drop))
         
-        return try JSON(node: ["success": true, "token": token])
+        let user = try User.authenticate(hashedAuth)
+        
+        let token = try UserToken.generate(for: user)
+        
+        try token.save()
+        
+        return token.token
+    }
+    
+    func me(request: Request) throws -> ResponseRepresentable {
+        
+        return try request.user()
     }
 }

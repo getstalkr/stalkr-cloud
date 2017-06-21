@@ -8,6 +8,7 @@
 
 import JWT
 import Vapor
+import AuthProvider
 import FluentProvider
 import Foundation
 
@@ -15,9 +16,13 @@ final class User: Model {
 
     let storage = Storage()
     
+    struct Properties {
+        static let username = "username"
+        static let password = "password"
+    }
+    
     var username: String
     var password: String
-    var token: String?
     
     public init(name: String, password: String) {
         self.username = name
@@ -25,30 +30,18 @@ final class User: Model {
     }
     
     required init(row: Row) throws {
-        username = try row.get("username")
-        password = try row.get("password")
-        token = try row.get("token")
+        username = try row.get(Properties.username)
+        password = try row.get(Properties.password)
     }
     
     func makeRow() throws -> Row {
         
         var row = Row()
         try row.set("id", id)
-        try row.set("username", username)
-        try row.set("password", password)
-        try row.set("token", token)
+        try row.set(Properties.username, username)
+        try row.set(Properties.password, password)
         
         return row
-    }
-    
-    func createToken() throws -> String {
-        let payload = try Node(node: ["user": id])
-        let jwt = try JWT(payload: JSON(payload), signer: HS256(key: "jwtkey".makeBytes()))
-        
-        let token = try jwt.createToken()
-        self.token = token
-        try self.save()
-        return token
     }
 }
 
@@ -60,9 +53,9 @@ extension User: Preparation {
         
         try database.create(self) { c in
             c.id()
-            c.string("username", length: nil, optional: false, unique: true, default: nil)
-            c.string("password")
-            c.string("token", length: nil, optional: true, unique: false, default: nil)
+            c.string(Properties.username, length: nil,
+                     optional: false, unique: true, default: nil)
+            c.string(Properties.password)
         }
     }
     
@@ -70,3 +63,69 @@ extension User: Preparation {
         try database.delete(self)
     }
 }
+
+// MARK: TokenAuthenticable
+
+extension User: TokenAuthenticatable {
+    
+    public typealias TokenType = UserToken
+}
+
+// MARK: PasswordAuthenticatable
+
+extension User: PasswordAuthenticatable {
+    
+    static var usernameKey: String {
+        return "username"
+    }
+    
+    static var passwordKey: String {
+        return "password"
+    }
+    
+    var hashedPassword: String? {
+        return password
+    }
+    
+    static var passwordVerifier: PasswordVerifier? {
+        get { return _userPasswordVerifier }
+        set { _userPasswordVerifier = newValue }
+    }
+    
+    static func authenticate(password: Password) throws -> User {
+        let name = password.username
+        let pass = password.password
+        
+        if let user = try User.first(with: [(Properties.username, name),
+                                            (Properties.password, pass)]) {
+            return user
+        }
+        
+        throw Abort.unauthorized
+    }
+}
+
+private var _userPasswordVerifier: PasswordVerifier? = nil
+
+// MARK: JSON
+
+extension User: JSONConvertible {
+    convenience init(json: JSON) throws {
+        try self.init(
+            name: json.get(Properties.username),
+            password: json.get(Properties.password)
+        )
+    }
+    
+    func makeJSON() throws -> JSON {
+        var json = JSON()
+        try json.set("id", id)
+        try json.set(Properties.username, username)
+        try json.set(Properties.password, password)
+        return json
+    }
+}
+
+// MARK: ResponseRepresentable
+
+extension User: ResponseRepresentable { }

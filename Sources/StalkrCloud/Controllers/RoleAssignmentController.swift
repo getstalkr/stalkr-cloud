@@ -10,6 +10,7 @@ import HTTP
 import Vapor
 import Foundation
 import MoreFluent
+import AuthProvider
 
 class RoleAssignmentController {
     
@@ -20,12 +21,16 @@ class RoleAssignmentController {
     }
     
     func addRoutes() {
+        
         drop.group("roleassignment") {
+            
+            let authed = $0.grouped(TokenAuthenticationMiddleware(User.self))
+            
             $0.get("all", handler: all)
             $0.get("role", handler: role)
             $0.get("user", handler: user)
             
-            $0.group(AuthMiddleware.admin) {
+            authed.group(RoleMiddleware.admin) {
                 $0.post("create", handler: create)
             }
         }

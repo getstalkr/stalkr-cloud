@@ -10,6 +10,7 @@ import HTTP
 import Vapor
 import MoreFluent
 import Foundation
+import AuthProvider
 
 class TeamMembershipController {
     
@@ -21,9 +22,9 @@ class TeamMembershipController {
     
     func addRoutes() {
         drop.group("teammembership") {
-            $0.group(AuthMiddleware.user) {
-                $0.post("create", handler: create)
-            }
+            let authed = $0.grouped(TokenAuthenticationMiddleware(User.self))
+            
+            authed.post("create", handler: create)
             
             $0.get("all", handler: all)
             $0.get("team", handler: team)

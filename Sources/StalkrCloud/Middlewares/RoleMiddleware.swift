@@ -12,10 +12,10 @@ import Vapor
 import Fluent
 import Foundation
 
-class AuthMiddleware: Middleware {
+class RoleMiddleware: Middleware {
     
-    static var admin: AuthMiddleware = AuthMiddleware(roleNames: ["admin"])
-    static var user: AuthMiddleware = AuthMiddleware(roleNames: ["user"])
+    static var admin: RoleMiddleware = RoleMiddleware(roleNames: ["admin"])
+    static var user: RoleMiddleware = RoleMiddleware(roleNames: ["user"])
     
     let roleNames: Set<String>
     
@@ -39,7 +39,7 @@ class AuthMiddleware: Middleware {
             throw Abort(Status.unauthorized, metadata: "unauthorized")
         }
         
-        request.user = user
+        //request.user = user
         
         return try next.respond(to: request)
     }

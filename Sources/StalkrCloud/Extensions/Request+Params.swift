@@ -11,6 +11,7 @@ import Foundation
 import HTTP
 import FluentProvider
 import Foundation
+import AuthProvider
 
 extension Request {
     

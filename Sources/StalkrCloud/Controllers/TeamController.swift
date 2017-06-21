@@ -9,6 +9,7 @@
 import HTTP
 import Vapor
 import Foundation
+import AuthProvider
 
 class TeamController {
     
@@ -19,10 +20,10 @@ class TeamController {
     }
     
     func addRoutes() {
-        drop.group("team") { team in
-            team.group(AuthMiddleware.user) { authTeam in
-                authTeam.post("create", handler: create)
-            }
+        drop.group("team") {
+            let authed = $0.grouped(TokenAuthenticationMiddleware(User.self))
+
+            authed.post("create", handler: create)
         }
     }
     
