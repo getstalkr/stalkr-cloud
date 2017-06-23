@@ -34,6 +34,6 @@ class SmartTokenController {
         
         try token.save()
         
-        return token.token
+        return token
     }
 }

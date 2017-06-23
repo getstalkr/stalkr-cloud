@@ -84,3 +84,27 @@ extension SmartToken: Preparation {
         try database.delete(self)
     }
 }
+
+// MARK: JSON
+
+extension SmartToken: JSONConvertible {
+    convenience init(json: JSON) throws {
+        try self.init(
+            string: json.get(Properties.token),
+            user: json.get(Properties.userId)
+        )
+    }
+    
+    func makeJSON() throws -> JSON {
+        var json = JSON()
+        try json.set("id", id)
+        try json.set(Properties.token, token)
+        try json.set(Properties.userId, userId)
+        try json.set(Properties.expiration, expiration)
+        return json
+    }
+}
+
+// MARK: ResponseRepresentable
+
+extension SmartToken: ResponseRepresentable { }
