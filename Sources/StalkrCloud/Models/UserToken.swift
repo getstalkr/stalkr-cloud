@@ -78,3 +78,26 @@ extension UserToken: Preparation {
         try database.delete(self)
     }
 }
+
+// MARK: JSON
+
+extension UserToken: JSONConvertible {
+    convenience init(json: JSON) throws {
+        try self.init(
+            string: json.get(Properties.token),
+            user: json.get(Properties.userId)
+        )
+    }
+    
+    func makeJSON() throws -> JSON {
+        var json = JSON()
+        try json.set("id", id)
+        try json.set(Properties.token, token)
+        try json.set(Properties.userId, userId)
+        return json
+    }
+}
+
+// MARK: ResponseRepresentable
+
+extension UserToken: ResponseRepresentable { }

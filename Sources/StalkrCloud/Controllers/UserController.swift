@@ -56,7 +56,7 @@ class UserController {
         
         try token.save()
         
-        return token.token
+        return token
     }
     
     func me(request: Request) throws -> ResponseRepresentable {
