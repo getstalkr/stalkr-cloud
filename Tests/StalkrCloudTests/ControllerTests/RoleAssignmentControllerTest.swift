@@ -35,7 +35,7 @@ class RoleAssignmentControllerTest: ControllerTest {
         let req = Request(method: .post, uri: "/roleassignment/create/")
         req.headers["roleid"] = role?.id?.string
         req.headers["userid"] = user.id?.string
-        req.headers["token"] = try admin.createToken()
+        req.setBearerAuth(token: adminToken.token)
         
         _ = try drop.respond(to: req)
         

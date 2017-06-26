@@ -23,7 +23,6 @@ class RoleAssignmentController {
     func addRoutes() {
         
         drop.group("roleassignment") {
-            
             let authed = $0.grouped(TokenAuthenticationMiddleware(User.self))
             
             $0.get("all", handler: all)

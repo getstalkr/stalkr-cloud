@@ -11,14 +11,14 @@ import XCTest
 @testable import StalkrCloud
 
 import Foundation
+import Crypto
 import Vapor
 
 class TeamControllerTest: ControllerTest {
     
     static var allTests = [
         ("testTeamCreate", testTeamCreate),
-        ("testTeamCreateWithoutAccessToken", testTeamCreateWithoutAccessToken),
-        ("testTeamCreateWithoutUserRole", testTeamCreateWithoutUserRole)
+        ("testTeamCreateWithoutAccessToken", testTeamCreateWithoutAccessToken)
     ]
     
     func testTeamCreate() throws {
@@ -39,12 +39,11 @@ class TeamControllerTest: ControllerTest {
             $0.userid = user.id
         }?.save()
         
-        let token = try user.createToken()
-        
         let req = Request(method: .post, uri: "/team/create/")
-        req.headers["name"] = name
-        req.headers["token"] = token
         
+        req.auth.authenticate(user)
+        req.headers["name"] = name
+
         _ = try drop.respond(to: req)
         
         let team = try Team.first(with: [("name", name)])
@@ -64,30 +63,5 @@ class TeamControllerTest: ControllerTest {
         let team = try Team.first(with: [("name", name)])
         
         XCTAssertNil(team, "team created without access token")
-    }
-    
-    func testTeamCreateWithoutUserRole() throws {
-        let prefix = "testTeamCreateWithoutUserRole_"
-        
-        let name = prefix + "name"
-        
-        let user = UserBuilder.build {
-            $0.username = prefix + "username"
-            $0.password = prefix + "password"
-        }
-        
-        try user.save()
-        
-        let token = try user.createToken()
-        
-        let req = Request(method: .post, uri: "/team/create/")
-        req.headers["name"] = name
-        req.headers["token"] = token
-        
-        _ = try drop.respond(to: req)
-        
-        let team = try Team.first(with: [("name", name)])
-        
-        XCTAssertNil(team, "team not created")
     }
 }

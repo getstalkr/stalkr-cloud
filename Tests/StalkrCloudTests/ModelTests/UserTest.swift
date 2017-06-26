@@ -19,8 +19,7 @@ class UserTest: XCTestCase {
     static var allTests = [
         ("testThatUserExists", testThatUserExists),
         ("testThatUserJoinsTeam", testThatUserJoinsTeam),
-        ("testThatUserAssignsRole", testThatUserAssignsRole),
-        ("testThatUserCreatesToken", testThatUserCreatesToken)
+        ("testThatUserAssignsRole", testThatUserAssignsRole)
     ]
     
     private var drop: Droplet!
@@ -81,20 +80,5 @@ class UserTest: XCTestCase {
                                                          ("roleid", role.id)])
         
         XCTAssertNotNil(assignment, "role_assignment not saved")
-    }
-    
-    func testThatUserCreatesToken() throws {
-        
-        let user = UserBuilder().build {
-            $0.uniqueUsername()
-        }
-        
-        try user.save()
-        
-        let token = try user.createToken()
-        
-        let queryUser = try User.makeQuery().filter("token", token).first()
-        
-        XCTAssertEqual(user.id, queryUser?.id, "token not saved")
     }
 }

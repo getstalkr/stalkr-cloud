@@ -32,4 +32,13 @@ extension Request {
         
         throw Abort(Status.badRequest, metadata: "missing bearer token".makeNode(in: nil))
     }
+    
+    func setBasicAuth(username: String, password: String) {
+        let encoded = "\(username):\(password)".makeBytes().base64Encoded.makeString()
+        headers[.authorization] = "Basic \(encoded)"
+    }
+    
+    func setBearerAuth(token: String) {
+        headers[.authorization] = "Bearer \(token)"
+    }
 }

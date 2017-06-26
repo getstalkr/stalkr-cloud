@@ -47,8 +47,10 @@ class UserController {
         
         let auth = try request.assertBasicAuth()
         
+        let hashedPassword = try auth.password.hashed(by: drop)
+        
         let hashedAuth = Password(username: auth.username,
-                                  password: try auth.password.hashed(by: drop))
+                                  password: hashedPassword)
         
         let user = try User.authenticate(hashedAuth)
         

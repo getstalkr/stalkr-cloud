@@ -25,13 +25,7 @@ class RoleMiddleware: Middleware {
     
     func respond(to request: Request, chainingTo next: Responder) throws -> Response {
         
-        guard let token = request.headers["token"]?.string else {
-            throw Abort(Status.badRequest, metadata: "missing token")
-        }
-        
-        guard let user = try User.first(with: [("token", token)]) else {
-            throw Abort(Status.badRequest, metadata: "invalid token")
-        }
+        let user = try request.user()
         
         let assignments = try RoleAssignment.all(with: [("userid", user.id)])
         

@@ -12,14 +12,15 @@
 import XCTest
 import HTTP
 import FluentProvider
+import AuthProvider
 import JWT
+import Crypto
 
 class UserControllerTest: ControllerTest {
     
     static var allTests = [
         ("testUserRegister", testUserRegister),
-        ("testUserLogin", testUserLogin),
-        ("testUserLoginError", testUserLoginError)
+        ("testUserLogin", testUserLogin)
     ]
     
     func testUserRegister() throws {
@@ -28,8 +29,7 @@ class UserControllerTest: ControllerTest {
         let password = "testUserRegister_password"
         
         let req = Request(method: .post, uri: "/user/register/")
-        req.headers["username"] = username
-        req.headers["password"] = password
+        req.setBasicAuth(username: username, password: password)
         
         _ = try drop.respond(to: req)
         
@@ -40,35 +40,20 @@ class UserControllerTest: ControllerTest {
     
     func testUserLogin() throws {
         let prefix = "testUserLogin"
-        let user = UserBuilder.build {
-            $0.username = "\(prefix)_username"
-            $0.password = "\(prefix)_password"
-        }
+        
+        let username = "\(prefix)_username"
+        let password = "\(prefix)_password"
+        
+        let hashedPassword = try password.hashed(by: drop)
+        
+        let user = User(name: username, password: hashedPassword)
         try user.save()
         
         let req = Request(method: .post, uri: "/user/login")
-        req.headers["username"] = user.username
-        req.headers["password"] = user.password
+        req.setBasicAuth(username: username, password: password)
         
         let res = try drop.respond(to: req)
 
-        XCTAssert(res.json?["success"] == true)
-    }
-    
-    func testUserLoginError() throws {
-        let prefix = "testUserLoginError"
-        let user = UserBuilder.build {
-            $0.username = "\(prefix)_username"
-            $0.password = "\(prefix)_password"
-        }
-        try user.save()
-        
-        let req = Request(method: .post, uri: "/user/login")
-        req.headers["username"] = user.username
-        req.headers["password"] = "wrong"
-        
-        let res = try drop.respond(to: req)
-        
-        XCTAssert(res.json?["success"] == false)
+        XCTAssertNotNil(res.json?["token"])
     }
 }

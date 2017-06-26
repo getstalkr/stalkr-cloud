@@ -41,8 +41,6 @@ class TeamMembershipControllerTest: ControllerTest {
         let team = TeamBuilder.build { $0.name = prefix + "name" }
         try team.save()
         
-        let token = try user.createToken()
-        
         
         guard let  userid = user.id,
               let _userid = userid.uint
@@ -61,7 +59,7 @@ class TeamMembershipControllerTest: ControllerTest {
         let req = Request(method: .post, uri: "/teammembership/create/")
         req.headers["userid"] = _userid.description
         req.headers["teamid"] = _teamid.description
-        req.headers["token"] = token
+        req.setBearerAuth(token: adminToken.token)
         
         _ = try drop.respond(to: req)
         

@@ -16,23 +16,37 @@ import Vapor
 class ControllerTest: XCTestCase {
     
     static var drop: Droplet!
-    static var admin: User!
     static var user: User!
+    static var userToken: UserToken!
+    static var admin: User!
+    static var adminToken: UserToken!
     
     var drop: Droplet {
         return ControllerTest.drop
     }
+    
+    var user: User {
+        return ControllerTest.user
+    }
+    
+    var userToken: UserToken {
+        return ControllerTest.userToken
+    }
+    
     var admin: User {
         return ControllerTest.admin
     }
-    var user: User {
-        return ControllerTest.user
+    
+    var adminToken: UserToken {
+        return ControllerTest.adminToken
     }
     
     override static func setUp() {
         drop = drop ?? Droplet.test
         user = user ?? makeTestUser()
+        userToken = userToken ?? makeTestUserToken()
         admin = admin ?? makeTestAdmin()
+        adminToken = adminToken ?? makeTestAdminToken()
     }
 
     static func makeTestUser() -> User {
@@ -52,7 +66,17 @@ class ControllerTest: XCTestCase {
             return user
         }
         catch {
-            fatalError("could not instantiate test user")
+            fatalError("could not make test user")
+        }
+    }
+    
+    static func makeTestUserToken() -> UserToken {
+        do {
+            let token = try UserToken.generate(for: user)
+            try token.save()
+            return token
+        } catch {
+            fatalError("could not make test user token")
         }
     }
     
@@ -73,7 +97,17 @@ class ControllerTest: XCTestCase {
             return user
         }
         catch {
-            fatalError("could not instantiate test admin")
+            fatalError("could not make test admin")
+        }
+    }
+    
+    static func makeTestAdminToken() -> UserToken {
+        do {
+            let token = try UserToken.generate(for: admin)
+            try token.save()
+            return token
+        } catch {
+            fatalError("could not make test admin token")
         }
     }
 }
