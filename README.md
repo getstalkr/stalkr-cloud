@@ -1,6 +1,6 @@
 # StalkrCloud
-[![Build Status](https://travis-ci.org/cardoso/stalkr-cloud.svg?branch=master)](https://travis-ci.org/cardoso/stalkr-cloud)
-[![Code Coverage](https://codecov.io/gh/cardoso/stalkr-cloud/branch/master/graph/badge.svg)](https://codecov.io/gh/cardoso/stalkr-cloud)
+[![Build Status](https://travis-ci.org/getstalkr/stalkr-cloud.svg?branch=master)](https://travis-ci.org/getstalkr/stalkr-cloud)
+[![Code Coverage](https://codecov.io/gh/getstalkr/stalkr-cloud/branch/master/graph/badge.svg)](https://codecov.io/gh/getstalkr/stalkr-cloud)
 
 ---
 
