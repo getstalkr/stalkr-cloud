@@ -14,6 +14,10 @@ import Foundation
 final class Team: Model {
 
     var storage = Storage()
+    
+    struct Properties {
+        static let name = "name"
+    }
 
     var name: String
     
@@ -22,11 +26,11 @@ final class Team: Model {
     }
     
     required init(row: Row) throws {
-        name = try row.get("name")
+        name = try row.get(Properties.name)
     }
     
     required init(node: Node, in context: Context) throws {
-        name = try node.get("name")
+        name = try node.get(Properties.name)
     }
     
     func makeRow() throws -> Row {
@@ -34,7 +38,7 @@ final class Team: Model {
         var row = Row()
         
         try row.set("id", id)
-        try row.set("name", name)
+        try row.set(Properties.name, name)
         
         return row
     }
@@ -44,7 +48,7 @@ final class Team: Model {
         var node = Node([:], in: context)
         
         try node.set("id", id)
-        try node.set("name", name)
+        try node.set(Properties.name, name)
         
         return node
     }
@@ -57,7 +61,8 @@ extension Team: Preparation {
     static func prepare(_ database: Database) throws {
         try database.create(self) { c in
             c.id()
-            c.string("name")
+            c.string(Properties.name, length: nil,
+                     optional: false, unique: true, default: nil)
         }
     }
     
@@ -65,3 +70,24 @@ extension Team: Preparation {
         try database.delete(self)
     }
 }
+
+// MARK: JSON
+
+extension Team: JSONConvertible {
+    convenience init(json: JSON) throws {
+        try self.init(
+            name: json.get(Properties.name)
+        )
+    }
+    
+    func makeJSON() throws -> JSON {
+        var json = JSON()
+        try json.set("id", id)
+        try json.set(Properties.name, name)
+        return json
+    }
+}
+
+// MARK: ResponseRepresentable
+
+extension Team: ResponseRepresentable { }

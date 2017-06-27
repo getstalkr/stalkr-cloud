@@ -41,11 +41,15 @@ class UserTest: XCTestCase {
     
     func testThatUserJoinsTeam() throws {
         
-        let team = TeamBuilder().build()
+        let prefix = "testThatUserJoinsTeam"
+        
+        let team = TeamBuilder.build {
+            $0.name = "\(prefix)_team_name"
+        }
         try team.save()
         
         let user = UserBuilder().build {
-            $0.uniqueUsername()
+            $0.username = "\(prefix)_user_username"
         }
         
         try user.save()

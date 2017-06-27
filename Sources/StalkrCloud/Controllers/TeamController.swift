@@ -29,11 +29,13 @@ class TeamController {
     
     func create(request: Request) throws -> ResponseRepresentable {
         
-        let name = try request.value(for: "name")
+        let name = try request.assertHeaderValue(forKey: "name")
+        
+        try Team.assertNoFirst(with: (Team.Properties.name, name))
         
         let team = Team(name: name)
         try team.save()
         
-        return JSON(["success": true])
+        return team
     }
 }

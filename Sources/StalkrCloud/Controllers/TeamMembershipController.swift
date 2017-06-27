@@ -33,8 +33,10 @@ class TeamMembershipController {
     }
     
     func create(request: Request) throws -> ResponseRepresentable {
-        let user = try User.findOrThrow(request.value(for: "userid"))
-        let team = try Team.findOrThrow(request.value(for: "teamid"))
+        let userid = try request.assertHeaderValue(forKey: "userid")
+        let user = try User.assertFind(userid)
+        let teamid = try request.assertHeaderValue(forKey: "teamid")
+        let team = try Team.assertFind(teamid)
         
         try TeamMembershipBuilder.build {
             $0.teamid = team.id!
@@ -49,12 +51,12 @@ class TeamMembershipController {
     }
     
     func team(request: Request) throws -> ResponseRepresentable {
-        let id = try request.value(for: "id")
-        return try TeamMembership.all(with: [("teamid", id.makeNode(in: nil))]).makeJSON()
+        let id = try request.assertHeaderValue(forKey: "id")
+        return try TeamMembership.all(with: [("teamid", id)]).makeJSON()
     }
     
     func user(request: Request) throws -> ResponseRepresentable {
-        let id = try request.value(for: "id")
-        return try TeamMembership.all(with: [("userid", id.makeNode(in: nil))]).makeJSON()
+        let id = try request.assertHeaderValue(forKey: "id")
+        return try TeamMembership.all(with: [("userid", id)]).makeJSON()
     }
 }

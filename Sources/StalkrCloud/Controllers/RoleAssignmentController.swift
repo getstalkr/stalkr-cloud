@@ -40,7 +40,8 @@ class RoleAssignmentController {
     }
     
     func user(request: Request) throws -> ResponseRepresentable {
-        let user = try User.findOrThrow(request.value(for: "id"))
+        let id = try request.assertHeaderValue(forKey: "id")
+        let user = try User.assertFind(id)
             
         let assignments = try RoleAssignment.all(with: [("userid", user.id)])
             
@@ -48,7 +49,8 @@ class RoleAssignmentController {
     }
     
     func role(request: Request) throws -> ResponseRepresentable {
-        let role = try Role.findOrThrow(request.value(for: "id"))
+        let id = try request.assertHeaderValue(forKey: "id")
+        let role = try Role.assertFind(id)
         
         let assignments = try RoleAssignment.all(with: [("roleid", role.id)])
         
@@ -56,8 +58,10 @@ class RoleAssignmentController {
     }
     
     func create(request: Request) throws -> ResponseRepresentable {
-        let user = try User.findOrThrow(request.value(for: "userid"))
-        let role = try Role.findOrThrow(request.value(for: "roleid"))
+        let userid = try request.assertHeaderValue(forKey: "userid")
+        let user = try User.assertFind(userid)
+        let roleid = try request.assertHeaderValue(forKey: "roleid")
+        let role = try Role.assertFind(roleid)
         
         let assignment = RoleAssignmentBuilder.build {
             $0.roleid = role.id
