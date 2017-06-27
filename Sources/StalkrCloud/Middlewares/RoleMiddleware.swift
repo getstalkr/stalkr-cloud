@@ -27,13 +27,11 @@ class RoleMiddleware: Middleware {
         
         let user = try request.user()
         
-        let assignments = try RoleAssignment.all(with: [("userid", user.id)])
+        let assignments = try user.roleAssignments.all()
         
-        guard roleNames.isSubset(of: try assignments.map { try $0.role()! }.map { $0.name }) else {
+        guard roleNames.isSubset(of: try assignments.map { try $0.role.get()! }.map { $0.name }) else {
             throw Abort(Status.unauthorized, metadata: "unauthorized")
         }
-        
-        //request.user = user
         
         return try next.respond(to: request)
     }

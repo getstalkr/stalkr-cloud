@@ -14,7 +14,8 @@ final class UserToken: Model {
 
     let storage: Storage = Storage()
     
-    struct Properties {
+    struct Keys {
+        static let id = UserToken.idKey
         static let token = "token"
         static let userId = User.foreignIdKey
     }
@@ -28,14 +29,14 @@ final class UserToken: Model {
     }
     
     init(row: Row) throws {
-        token = try row.get(Properties.token)
-        userId = try row.get(Properties.userId)
+        token = try row.get(Keys.token)
+        userId = try row.get(Keys.userId)
     }
     
     func makeRow() throws -> Row {
         var row = Row()
-        try row.set(Properties.token, token)
-        try row.set(Properties.userId, userId)
+        try row.set(Keys.token, token)
+        try row.set(Keys.userId, userId)
         return row
     }
 }
@@ -58,7 +59,7 @@ extension UserToken {
 
 extension UserToken {
     var user: Parent<UserToken, User> {
-        return parent(id: id)
+        return parent(id: userId)
     }
 }
 
@@ -66,10 +67,9 @@ extension UserToken {
 
 extension UserToken: Preparation {
     static func prepare(_ database: Database) throws {
-        
         try database.create(self) { c in
             c.id()
-            c.string(Properties.token)
+            c.string(Keys.token)
             c.foreignId(for: User.self)
         }
     }
@@ -84,16 +84,16 @@ extension UserToken: Preparation {
 extension UserToken: JSONConvertible {
     convenience init(json: JSON) throws {
         try self.init(
-            string: json.get(Properties.token),
-            user: json.get(Properties.userId)
+            string: json.get(Keys.token),
+            user: json.get(Keys.userId)
         )
     }
     
     func makeJSON() throws -> JSON {
         var json = JSON()
-        try json.set("id", id)
-        try json.set(Properties.token, token)
-        try json.set(Properties.userId, userId)
+        try json.set(Keys.id, id)
+        try json.set(Keys.token, token)
+        try json.set(Keys.userId, userId)
         return json
     }
 }

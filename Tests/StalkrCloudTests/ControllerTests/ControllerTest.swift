@@ -59,8 +59,8 @@ class ControllerTest: XCTestCase {
             
             let role = try Role.withName("user")
             try RoleAssignmentBuilder.build {
-                $0.userid = user.id
-                $0.roleid = role?.id
+                $0.userId = user.id
+                $0.roleId = role?.id
             }?.save()
             
             return user
@@ -90,8 +90,8 @@ class ControllerTest: XCTestCase {
             
             let role = try Role.withName("admin")
             try RoleAssignmentBuilder.build {
-                $0.userid = user.id
-                $0.roleid = role?.id
+                $0.userId = user.id
+                $0.roleId = role?.id
             }?.save()
             
             return user

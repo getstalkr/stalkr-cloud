@@ -55,11 +55,11 @@ class UserTest: XCTestCase {
         try user.save()
         
         try TeamMembershipBuilder.build {
-            $0.teamid = team.id
-            $0.userid = user.id
+            $0.teamId = team.id
+            $0.userId = user.id
         }?.save()
         
-        let membership = try TeamMembership.first(with: [("userid", user.id)])
+        let membership = try user.teamMemberships.first()
         
         XCTAssertNotNil(membership, "team_membership not saved")
     }
@@ -76,12 +76,12 @@ class UserTest: XCTestCase {
         try user.save()
         
         try RoleAssignmentBuilder.build {
-            $0.roleid = role.id
-            $0.userid = user.id
+            $0.roleId = role.id
+            $0.userId = user.id
         }?.save()
         
-        let assignment = try RoleAssignment.first(with: [("userid", user.id),
-                                                         ("roleid", role.id)])
+        let assignment = try RoleAssignment.first(with: (RoleAssignment.Keys.userId, user.id),
+                                                        (RoleAssignment.Keys.roleId, role.id))
         
         XCTAssertNotNil(assignment, "role_assignment not saved")
     }

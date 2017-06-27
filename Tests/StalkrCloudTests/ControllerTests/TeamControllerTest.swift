@@ -35,8 +35,8 @@ class TeamControllerTest: ControllerTest {
         
         let role = try Role.withName("user")
         try RoleAssignmentBuilder.build {
-            $0.roleid = role?.id
-            $0.userid = user.id
+            $0.roleId = role?.id
+            $0.userId = user.id
         }?.save()
         
         let req = Request(method: .post, uri: "/team/create/")

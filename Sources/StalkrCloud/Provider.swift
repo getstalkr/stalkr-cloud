@@ -50,25 +50,22 @@ public class Provider: Vapor.Provider {
 
     
     func setup(_ drop: Droplet) throws {
-        
         // Preparations
-        
-        if let db = drop.database {
-            
+        if let _ = drop.database {
             let admin = User(name: "admin", password: "123456")
             
             try admin.save()
             
             let adminRoleId = try Role.withName("admin")?.id
             try RoleAssignmentBuilder().build {
-                $0.roleid = adminRoleId
-                $0.userid = admin.id
+                $0.roleId = adminRoleId
+                $0.userId = admin.id
             }?.save()
             
             let userRoleId = try Role.withName("user")?.id
             try RoleAssignmentBuilder().build {
-                $0.roleid = userRoleId
-                $0.userid = admin.id
+                $0.roleId = userRoleId
+                $0.userId = admin.id
             }?.save()
         }
         

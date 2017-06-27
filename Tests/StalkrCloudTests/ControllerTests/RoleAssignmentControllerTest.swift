@@ -33,13 +33,14 @@ class RoleAssignmentControllerTest: ControllerTest {
         let role = try Role.withName("user")
         
         let req = Request(method: .post, uri: "/roleassignment/create/")
-        req.headers["roleid"] = role?.id?.string
-        req.headers["userid"] = user.id?.string
+        req.headers["role_id"] = role?.id?.string
+        req.headers["user_id"] = user.id?.string
         req.setBearerAuth(token: adminToken.token)
         
         _ = try drop.respond(to: req)
         
-        let assignment = try RoleAssignment.first(with: [("roleid", role?.id), ("userid", user.id)])
+        let assignment = try RoleAssignment.first(with: (RoleAssignment.Keys.roleId, role?.id),
+                                                        (RoleAssignment.Keys.userId, user.id))
         
         XCTAssertNotNil(assignment, "assignment not created")
     }
@@ -60,8 +61,8 @@ class RoleAssignmentControllerTest: ControllerTest {
         let assignments = roles.map { r in
             users.map { u in
                 RoleAssignmentBuilder.build { b in
-                    b.roleid = r.id
-                    b.userid = u.id
+                    b.roleId = r.id
+                    b.userId = u.id
                 }
             }
         }.flatMap {$0}
@@ -91,8 +92,8 @@ class RoleAssignmentControllerTest: ControllerTest {
         let assignments = roles.map { r in
             users.map { u in
                 RoleAssignmentBuilder.build { b in
-                    b.roleid = r.id
-                    b.userid = u.id
+                    b.roleId = r.id
+                    b.userId = u.id
                 }
             }
             }.flatMap {$0}
@@ -106,7 +107,7 @@ class RoleAssignmentControllerTest: ControllerTest {
         
         let res = try drop.respond(to: req)
         
-        XCTAssert(try res.body.bytes! == RoleAssignment.all(with: [("roleid", role.id)]).makeJSON().makeResponse().body.bytes!)
+        XCTAssert(try res.body.bytes! == role.roleAssignments.all().makeJSON().makeResponse().body.bytes!)
     }
     
     func testRoleAssignmentUser() throws {
@@ -126,8 +127,8 @@ class RoleAssignmentControllerTest: ControllerTest {
         let assignments = roles.map { r in
             users.map { u in
                 RoleAssignmentBuilder.build { b in
-                    b.roleid = r.id
-                    b.userid = u.id
+                    b.roleId = r.id
+                    b.userId = u.id
                 }
             }
             }.flatMap {$0}
@@ -141,6 +142,6 @@ class RoleAssignmentControllerTest: ControllerTest {
         
         let res = try drop.respond(to: req)
         
-        XCTAssert(try res.body.bytes! == RoleAssignment.all(with: [("userid", user.id)]).makeJSON().makeResponse().body.bytes!)
+        XCTAssert(try res.body.bytes! == user.roleAssignments.all().makeJSON().makeResponse().body.bytes!)
     }
 }

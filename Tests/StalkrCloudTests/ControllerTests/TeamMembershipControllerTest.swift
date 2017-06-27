@@ -34,8 +34,8 @@ class TeamMembershipControllerTest: ControllerTest {
         
         let role = try Role.withName("user")
         try RoleAssignmentBuilder.build {
-            $0.roleid = role?.id
-            $0.userid = user.id
+            $0.roleId = role?.id
+            $0.userId = user.id
         }?.save()
         
         let team = TeamBuilder.build { $0.name = prefix + "name" }
@@ -57,13 +57,14 @@ class TeamMembershipControllerTest: ControllerTest {
         }
         
         let req = Request(method: .post, uri: "/teammembership/create/")
-        req.headers["userid"] = _userid.description
-        req.headers["teamid"] = _teamid.description
+        req.headers["user_id"] = _userid.description
+        req.headers["team_id"] = _teamid.description
         req.setBearerAuth(token: adminToken.token)
         
         _ = try drop.respond(to: req)
         
-        let membership = try TeamMembership.first(with: [("teamid", teamid), ("userid", userid)])
+        let membership = try TeamMembership.first(with: (TeamMembership.Keys.teamId, teamid),
+                                                        (TeamMembership.Keys.userId, userid))
         
         XCTAssertNotNil(membership, "membership not created")
     }
@@ -90,8 +91,8 @@ class TeamMembershipControllerTest: ControllerTest {
         let memberships = teams.map { t in
             users.map { u in
                 TeamMembershipBuilder.build { b in
-                    b.teamid = t.id
-                    b.userid = u.id
+                    b.teamId = t.id
+                    b.userId = u.id
                 }
             }
         }.flatMap {$0}
@@ -123,8 +124,8 @@ class TeamMembershipControllerTest: ControllerTest {
         let memberships = teams.map { t in
             users.map { u in
                 TeamMembershipBuilder.build { b in
-                    b.teamid = t.id
-                    b.userid = u.id
+                    b.teamId = t.id
+                    b.userId = u.id
                 }
             }
         }.flatMap {$0}
@@ -138,7 +139,7 @@ class TeamMembershipControllerTest: ControllerTest {
         
         let res = try drop.respond(to: req)
         
-        XCTAssert(try res.body.bytes! == TeamMembership.all(with: [("teamid", team.id)]).makeJSON().makeResponse().body.bytes!)
+        XCTAssert(try res.body.bytes! == team.teamMemberships.all().makeJSON().makeResponse().body.bytes!)
     }
     
     func testTeamMembershipUser() throws {
@@ -159,8 +160,8 @@ class TeamMembershipControllerTest: ControllerTest {
         let memberships = teams.map { t in
             users.map { u in
                 TeamMembershipBuilder.build { b in
-                    b.teamid = t.id
-                    b.userid = u.id
+                    b.teamId = t.id
+                    b.userId = u.id
                 }
             }
             }.flatMap {$0}
@@ -174,6 +175,6 @@ class TeamMembershipControllerTest: ControllerTest {
         
         let res = try drop.respond(to: req)
         
-        XCTAssert(try res.body.bytes! == TeamMembership.all(with: [("userid", user.id)]).makeJSON().makeResponse().body.bytes!)
+        XCTAssert(try res.body.bytes! == user.teamMemberships.all().makeJSON().makeResponse().body.bytes!)
     }
 }

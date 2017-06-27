@@ -11,7 +11,6 @@ import Foundation
 import FluentProvider
 
 protocol Builder {
-    
     associatedtype T
     
     typealias BuilderClosure = (Self) -> ()
@@ -29,7 +28,6 @@ protocol Builder {
 }
 
 extension Builder {
-    
     static func build(buildClosure: BuilderClosure? = nil) -> T {
         return Self().build(buildClosure: buildClosure)
     }
@@ -52,7 +50,6 @@ extension Builder {
 }
 
 final class UserBuilder: Builder {
-    
     typealias T = User
     
     func uniqueUsername() {
@@ -70,7 +67,6 @@ final class UserBuilder: Builder {
 }
 
 final class TeamBuilder: Builder {
-    
     typealias T = Team
     
     var name: String = "anyName"
@@ -81,15 +77,14 @@ final class TeamBuilder: Builder {
 }
 
 final class TeamMembershipBuilder: Builder {
-    
     typealias T = TeamMembership?
     
-    var userid: Identifier?
-    var teamid: Identifier?
+    var userId: Identifier?
+    var teamId: Identifier?
     
     func finish() -> TeamMembership? {
-        if let userid = userid, let teamid = teamid {
-            return TeamMembership(teamid: teamid, userid: userid)
+        if let teamId = teamId, let userId = userId {
+            return TeamMembership(teamId: teamId, userId: userId)
         }
         
         return nil
@@ -97,7 +92,6 @@ final class TeamMembershipBuilder: Builder {
 }
 
 final class RoleBuilder: Builder {
-    
     typealias T = Role
     
     var name: String = "anyName"
@@ -109,15 +103,14 @@ final class RoleBuilder: Builder {
 }
 
 final class RoleAssignmentBuilder: Builder {
-    
     typealias T = RoleAssignment?
     
-    var userid: Identifier?
-    var roleid: Identifier?
+    var userId: Identifier?
+    var roleId: Identifier?
     
     func finish() -> RoleAssignment? {
-        if let userid = userid, let roleid = roleid {
-            return RoleAssignment(roleid: roleid, userid: userid)
+        if let userId = userId, let roleId = roleId {
+            return RoleAssignment(roleId: roleId, userId: userId)
         }
         
         return nil

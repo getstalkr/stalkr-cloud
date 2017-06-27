@@ -14,6 +14,12 @@ final class Role: Model {
     
     var storage = Storage()
     
+    struct Keys {
+        static let id = Role.idKey
+        static let name = "name"
+        static let readableName = "readable_name"
+    }
+    
     var name: String
     var readableName: String
     
@@ -23,23 +29,19 @@ final class Role: Model {
     }
     
     required init(row: Row) throws {
-        name = try row.get("name")
-        readableName = try row.get("readable_name")
+        name = try row.get(Keys.name)
+        readableName = try row.get(Keys.readableName)
     }
     
     func makeRow() throws -> Row {
-        
         var row = Row()
-        
-        try row.set("id", id)
-        try row.set("name", name)
-        try row.set("readable_name", readableName)
-        
+        try row.set(Keys.name, name)
+        try row.set(Keys.readableName, readableName)
         return row
     }
     
     class func withName(_ name: String) throws -> Role? {
-        return try Role.first(with: [("name", name)])
+        return try Role.first(with: (Keys.name, name))
     }
 }
 
@@ -50,8 +52,8 @@ extension Role: Preparation {
     static func prepare(_ database: Database) throws {
         try database.create(self) { c in
             c.id()
-            c.string("name", length: nil, optional: false, unique: true, default: nil)
-            c.string("readable_name")
+            c.string(Keys.name, length: nil, optional: false, unique: true, default: nil)
+            c.string(Keys.readableName)
         }
         
         try Role(name: "admin", readableName: "Admin").save()
@@ -68,16 +70,16 @@ extension Role: Preparation {
 extension Role: JSONConvertible {
     convenience init(json: JSON) throws {
         try self.init(
-            name: json.get("name"),
-            readableName: json.get("readable_name")
+            name: json.get(Keys.name),
+            readableName: json.get(Keys.readableName)
         )
     }
     
     func makeJSON() throws -> JSON {
         var json = JSON()
-        try json.set("id", id)
-        try json.set("name", name)
-        try json.set("readable_name", readableName)
+        try json.set(Keys.id, id)
+        try json.set(Keys.name, name)
+        try json.set(Keys.readableName, readableName)
         return json
     }
 }

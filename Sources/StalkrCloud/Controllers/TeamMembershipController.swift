@@ -33,17 +33,22 @@ class TeamMembershipController {
     }
     
     func create(request: Request) throws -> ResponseRepresentable {
-        let userid = try request.assertHeaderValue(forKey: "userid")
-        let user = try User.assertFind(userid)
-        let teamid = try request.assertHeaderValue(forKey: "teamid")
-        let team = try Team.assertFind(teamid)
+        let userId = try request.assertHeaderValue(forKey: "user_id")
+        let user = try User.assertFind(userId)
+        let teamId = try request.assertHeaderValue(forKey: "team_id")
+        let team = try Team.assertFind(teamId)
         
-        try TeamMembershipBuilder.build {
-            $0.teamid = team.id!
-            $0.userid = user.id!
-        }?.save()
+        try TeamMembership.assertNoFirst(with: (TeamMembership.Keys.userId, userId),
+                                               (TeamMembership.Keys.teamId, teamId))
         
-        return JSON(["success": true])
+        let membership = TeamMembershipBuilder.build {
+            $0.teamId = team.id!
+            $0.userId = user.id!
+        }!
+        
+        try membership.save()
+        
+        return membership
     }
     
     func all(request: Request) throws -> ResponseRepresentable {
@@ -52,11 +57,11 @@ class TeamMembershipController {
     
     func team(request: Request) throws -> ResponseRepresentable {
         let id = try request.assertHeaderValue(forKey: "id")
-        return try TeamMembership.all(with: [("teamid", id)]).makeJSON()
+        return try TeamMembership.all(with: (TeamMembership.Keys.teamId, id)).makeJSON()
     }
     
     func user(request: Request) throws -> ResponseRepresentable {
         let id = try request.assertHeaderValue(forKey: "id")
-        return try TeamMembership.all(with: [("userid", id)]).makeJSON()
+        return try TeamMembership.all(with: (TeamMembership.Keys.userId, id)).makeJSON()
     }
 }

@@ -15,26 +15,54 @@ final class TeamMembership: Model {
 
     let storage = Storage()
     
-    var teamid: Identifier
-    var userid: Identifier
+    struct Keys {
+        static let id = TeamMembership.idKey
+        static let teamId = Team.foreignIdKey
+        static let userId = User.foreignIdKey
+    }
     
-    init(teamid: Identifier, userid: Identifier) {
-        self.teamid = teamid
-        self.userid = userid
+    var teamId: Identifier
+    var userId: Identifier
+    
+    init(teamId: Identifier, userId: Identifier) {
+        self.teamId = teamId
+        self.userId = userId
     }
     
     required init(row: Row) throws {
-        teamid = try row.get("teamid")
-        userid = try row.get("userid")
+        teamId = try row.get(Keys.teamId)
+        userId = try row.get(Keys.userId)
     }
     
     func makeRow() throws -> Row {
         var row = Row()
-        try row.set("id", id)
-        try row.set("teamid", teamid)
-        try row.set("userid", userid)
-        
+        try row.set(Keys.teamId, teamId)
+        try row.set(Keys.userId, userId)
         return row
+    }
+}
+
+// MARK: Relations
+
+extension TeamMembership {
+    var team: Parent<TeamMembership, Team> {
+        return parent(id: teamId)
+    }
+    
+    var user: Parent<TeamMembership, User> {
+        return parent(id: userId)
+    }
+}
+
+extension Team {
+    var teamMemberships: Children<Team, TeamMembership> {
+        return children()
+    }
+}
+
+extension User {
+    var teamMemberships: Children<User, TeamMembership> {
+        return children()
     }
 }
 
@@ -43,21 +71,20 @@ final class TeamMembership: Model {
 extension TeamMembership: Preparation {
     
     static func prepare(_ database: Database) throws {
-        
         try database.create(self) { c in
-            
             c.id()
             
-            let teamid = Field(name: "teamid", type: .int, optional: false,
+            let teamId = Field(name: Keys.teamId, type: .int, optional: false,
                                unique: false, default: nil, primaryKey: true)
-            let userid = Field(name: "userid", type: .int, optional: false,
-                               unique: false, default: nil, primaryKey: true)
-        
-            c.field(teamid)
-            c.field(userid)
             
-            c.foreignKey(foreignIdKey: "teamid", referencesIdKey: "id", on: Team.self, name: nil)
-            c.foreignKey(foreignIdKey: "userid", referencesIdKey: "id", on: User.self, name: nil)
+            let userId = Field(name: Keys.userId, type: .int, optional: false,
+                               unique: false, default: nil, primaryKey: true)
+            
+            c.field(teamId)
+            c.field(userId)
+            
+            c.foreignKey(for: Team.self)
+            c.foreignKey(for: User.self)
         }
     }
     
@@ -71,27 +98,13 @@ extension TeamMembership: Preparation {
 extension TeamMembership: JSONRepresentable {
     func makeJSON() throws -> JSON {
         var json = JSON()
-        
-        try json.set("id", self.id)
-        try json.set("teamid", self.teamid)
-        try json.set("userid", self.userid)
-        
+        try json.set(Keys.id, self.id)
+        try json.set(Keys.teamId, self.teamId)
+        try json.set(Keys.userId, self.userId)
         return json
     }
 }
 
-// MARK: Team
+// MARK: ResponseRepresentable
 
-/*extension TeamMembership {
-    func team() throws -> Team? {
-        return try Team.find(teamid)
-    }
-}*/
-
-// MARK: User
-
-/*extension TeamMembership {
-    func user() throws -> User? {
-        return try User.find(userid)
-    }
-}*/
+extension TeamMembership: ResponseRepresentable { }

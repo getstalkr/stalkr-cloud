@@ -32,10 +32,9 @@ class UserController {
     }
     
     func register(request: Request) throws -> ResponseRepresentable {
-        
         let auth = try request.assertBasicAuth()
         
-        try User.assertNoFirst(with: (User.Properties.username,
+        try User.assertNoFirst(with: (User.Keys.username,
                                       auth.username))
         
         let user = User(name: auth.username,
@@ -47,7 +46,6 @@ class UserController {
     }
     
     func login(request: Request) throws -> ResponseRepresentable {
-        
         let auth = try request.assertBasicAuth()
         
         let hashedPassword = try auth.password.hashed(by: drop)
@@ -65,7 +63,6 @@ class UserController {
     }
     
     func me(request: Request) throws -> ResponseRepresentable {
-        
         return try request.user()
     }
 }

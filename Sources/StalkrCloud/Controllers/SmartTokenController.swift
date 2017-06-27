@@ -40,7 +40,7 @@ class SmartTokenController {
     func validate(request: Request) throws -> ResponseRepresentable {
         let _token = try request.assertHeaderValue(forKey: "smart_token")
         
-        let token = try SmartToken.assertFirst(with: (SmartToken.Properties.token, _token))
+        let token = try SmartToken.assertFirst(with: (SmartToken.Keys.token, _token))
         
         return token
     }

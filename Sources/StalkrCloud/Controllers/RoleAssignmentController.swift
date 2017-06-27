@@ -21,7 +21,6 @@ class RoleAssignmentController {
     }
     
     func addRoutes() {
-        
         drop.group("roleassignment") {
             let authed = $0.grouped(TokenAuthenticationMiddleware(User.self))
             
@@ -43,7 +42,7 @@ class RoleAssignmentController {
         let id = try request.assertHeaderValue(forKey: "id")
         let user = try User.assertFind(id)
             
-        let assignments = try RoleAssignment.all(with: [("userid", user.id)])
+        let assignments = try RoleAssignment.all(with: (RoleAssignment.Keys.userId, user.id))
             
         return try assignments.makeJSON()
     }
@@ -52,24 +51,24 @@ class RoleAssignmentController {
         let id = try request.assertHeaderValue(forKey: "id")
         let role = try Role.assertFind(id)
         
-        let assignments = try RoleAssignment.all(with: [("roleid", role.id)])
+        let assignments = try RoleAssignment.all(with: (RoleAssignment.Keys.roleId, role.id))
         
         return try assignments.makeJSON()
     }
     
     func create(request: Request) throws -> ResponseRepresentable {
-        let userid = try request.assertHeaderValue(forKey: "userid")
+        let userid = try request.assertHeaderValue(forKey: "user_id")
         let user = try User.assertFind(userid)
-        let roleid = try request.assertHeaderValue(forKey: "roleid")
+        let roleid = try request.assertHeaderValue(forKey: "role_id")
         let role = try Role.assertFind(roleid)
         
         let assignment = RoleAssignmentBuilder.build {
-            $0.roleid = role.id
-            $0.userid = user.id
-        }
+            $0.roleId = role.id
+            $0.userId = user.id
+        }!
         
-        try assignment?.save()
+        try assignment.save()
         
-        return JSON(["success": true])
+        return assignment
     }
 }

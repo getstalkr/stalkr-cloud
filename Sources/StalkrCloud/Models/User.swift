@@ -16,7 +16,8 @@ final class User: Model {
 
     let storage = Storage()
     
-    struct Properties {
+    struct Keys {
+        static let id = User.idKey
         static let username = "username"
         static let password = "password"
     }
@@ -30,17 +31,14 @@ final class User: Model {
     }
     
     required init(row: Row) throws {
-        username = try row.get(Properties.username)
-        password = try row.get(Properties.password)
+        username = try row.get(Keys.username)
+        password = try row.get(Keys.password)
     }
     
     func makeRow() throws -> Row {
-        
         var row = Row()
-        try row.set("id", id)
-        try row.set(Properties.username, username)
-        try row.set(Properties.password, password)
-        
+        try row.set(Keys.username, username)
+        try row.set(Keys.password, password)
         return row
     }
 }
@@ -50,12 +48,11 @@ final class User: Model {
 extension User: Preparation {
     
     static func prepare(_ database: Database) throws {
-        
         try database.create(self) { c in
             c.id()
-            c.string(Properties.username, length: nil,
+            c.string(Keys.username, length: nil,
                      optional: false, unique: true, default: nil)
-            c.string(Properties.password)
+            c.string(Keys.password)
         }
     }
     
@@ -67,7 +64,6 @@ extension User: Preparation {
 // MARK: TokenAuthenticable
 
 extension User: TokenAuthenticatable {
-    
     public typealias TokenType = UserToken
 }
 
@@ -76,11 +72,11 @@ extension User: TokenAuthenticatable {
 extension User: PasswordAuthenticatable {
     
     static var usernameKey: String {
-        return "username"
+        return Keys.username
     }
     
     static var passwordKey: String {
-        return "password"
+        return Keys.password
     }
     
     var hashedPassword: String? {
@@ -96,8 +92,8 @@ extension User: PasswordAuthenticatable {
         let name = password.username
         let pass = password.password
         
-        if let user = try User.first(with: [(Properties.username, name),
-                                            (Properties.password, pass)]) {
+        if let user = try User.first(with: [(Keys.username, name),
+                                            (Keys.password, pass)]) {
             return user
         }
         
@@ -112,16 +108,16 @@ private var _userPasswordVerifier: PasswordVerifier? = nil
 extension User: JSONConvertible {
     convenience init(json: JSON) throws {
         try self.init(
-            name: json.get(Properties.username),
-            password: json.get(Properties.password)
+            name: json.get(Keys.username),
+            password: json.get(Keys.password)
         )
     }
     
     func makeJSON() throws -> JSON {
         var json = JSON()
-        try json.set("id", id)
-        try json.set(Properties.username, username)
-        try json.set(Properties.password, password)
+        try json.set(Keys.id, id)
+        try json.set(Keys.username, username)
+        try json.set(Keys.password, password)
         return json
     }
 }

@@ -14,26 +14,54 @@ final class RoleAssignment: Model {
     
     let storage = Storage()
     
-    var roleid: Identifier
-    var userid: Identifier
+    struct Keys {
+        static let id = RoleAssignment.idKey
+        static let roleId = Role.foreignIdKey
+        static let userId = User.foreignIdKey
+    }
     
-    init(roleid: Identifier, userid: Identifier) {
-        self.roleid = roleid
-        self.userid = userid
+    var roleId: Identifier
+    var userId: Identifier
+    
+    init(roleId: Identifier, userId: Identifier) {
+        self.roleId = roleId
+        self.userId = userId
     }
     
     required init(row: Row) throws {
-        roleid = try row.get("roleid")
-        userid = try row.get("userid")
+        roleId = try row.get(Keys.roleId)
+        userId = try row.get(Keys.userId)
     }
     
     func makeRow() throws -> Row {
         var row = Row()
-        try row.set("id", id)
-        try row.set("roleid", roleid)
-        try row.set("userid", userid)
-        
+        try row.set(Keys.roleId, roleId)
+        try row.set(Keys.userId, userId)
         return row
+    }
+}
+
+// MARK: Relations
+
+extension RoleAssignment {
+    var role: Parent<RoleAssignment, Role> {
+        return parent(id: roleId)
+    }
+    
+    var user: Parent<RoleAssignment, User> {
+        return parent(id: userId)
+    }
+}
+
+extension Role {
+    var roleAssignments: Children<Role, RoleAssignment> {
+        return children()
+    }
+}
+
+extension User {
+    var roleAssignments: Children<User, RoleAssignment> {
+        return children()
     }
 }
 
@@ -42,21 +70,22 @@ final class RoleAssignment: Model {
 extension RoleAssignment: Preparation {
     
     static func prepare(_ database: Database) throws {
-        
         try database.create(self) { c in
-            
             c.id()
             
-            let roleid = Field(name: "roleid", type: .int, optional: false,
-                               unique: false, default: nil, primaryKey: true)
-            let userid = Field(name: "userid", type: .int, optional: false,
-                               unique: false, default: nil, primaryKey: true)
+            c.parent(Role.self, optional: false, unique: false, foreignIdKey: Role.foreignIdKey)
+            c.parent(User.self, optional: false, unique: false, foreignIdKey: User.foreignIdKey)
+            //let roleId = Field(name: Keys.roleId, type: .int, optional: false,
+            //                   unique: false, default: nil, primaryKey: true)
             
-            c.field(roleid)
-            c.field(userid)
-
-            c.foreignKey(foreignIdKey: "roleid", referencesIdKey: "id", on: Role.self, name: nil)
-            c.foreignKey(foreignIdKey: "userid", referencesIdKey: "id", on: User.self, name: nil)
+            //let userId = Field(name: Keys.userId, type: .int, optional: false,
+                            //unique: false, default: nil, primaryKey: true)
+            
+            //c.field(roleId)
+            //c.field(userId)
+            
+            //c.foreignKey(for: Role.self)
+            //c.foreignKey(for: User.self)
         }
     }
     
@@ -70,32 +99,20 @@ extension RoleAssignment: Preparation {
 extension RoleAssignment: JSONConvertible {
     convenience init(json: JSON) throws {
         try self.init(
-            roleid: json.get("roleid"),
-            userid: json.get("userid")
+            roleId: json.get(Keys.roleId),
+            userId: json.get(Keys.userId)
         )
     }
     
     func makeJSON() throws -> JSON {
         var json = JSON()
-        try json.set("id", id)
-        try json.set("roleid", roleid)
-        try json.set("userid", userid)
+        try json.set(Keys.id, id)
+        try json.set(Keys.roleId, roleId)
+        try json.set(Keys.userId, userId)
         return json
     }
 }
 
-// MARK: User
+// MARK: ResponseRepresentable
 
-extension RoleAssignment {
-    func user() throws -> User? {
-        return try User.find(userid)
-    }
-}
-
-// MARK: Role
-
-extension RoleAssignment {
-    func role() throws -> Role? {
-        return try Role.find(roleid)
-    }
-}
+extension RoleAssignment: ResponseRepresentable { }

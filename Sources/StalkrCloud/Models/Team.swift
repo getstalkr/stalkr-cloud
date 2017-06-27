@@ -15,7 +15,8 @@ final class Team: Model {
 
     var storage = Storage()
     
-    struct Properties {
+    struct Keys {
+        static let id = Team.idKey
         static let name = "name"
     }
 
@@ -26,31 +27,17 @@ final class Team: Model {
     }
     
     required init(row: Row) throws {
-        name = try row.get(Properties.name)
+        name = try row.get(Keys.name)
     }
     
     required init(node: Node, in context: Context) throws {
-        name = try node.get(Properties.name)
+        name = try node.get(Keys.name)
     }
     
     func makeRow() throws -> Row {
-        
         var row = Row()
-        
-        try row.set("id", id)
-        try row.set(Properties.name, name)
-        
+        try row.set(Keys.name, name)
         return row
-    }
-    
-    func makeNode(context: Context) throws -> Node {
-        
-        var node = Node([:], in: context)
-        
-        try node.set("id", id)
-        try node.set(Properties.name, name)
-        
-        return node
     }
 }
 
@@ -61,7 +48,7 @@ extension Team: Preparation {
     static func prepare(_ database: Database) throws {
         try database.create(self) { c in
             c.id()
-            c.string(Properties.name, length: nil,
+            c.string(Keys.name, length: nil,
                      optional: false, unique: true, default: nil)
         }
     }
@@ -76,14 +63,14 @@ extension Team: Preparation {
 extension Team: JSONConvertible {
     convenience init(json: JSON) throws {
         try self.init(
-            name: json.get(Properties.name)
+            name: json.get(Keys.name)
         )
     }
     
     func makeJSON() throws -> JSON {
         var json = JSON()
-        try json.set("id", id)
-        try json.set(Properties.name, name)
+        try json.set(Keys.id, id)
+        try json.set(Keys.name, name)
         return json
     }
 }
