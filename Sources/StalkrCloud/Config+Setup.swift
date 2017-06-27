@@ -14,11 +14,18 @@ public extension Config {
         Node.fuzzy = [Row.self, JSON.self, Node.self]
         
         try setupProviders()
+        try setupMiddlwares()
     }
     
     private func setupProviders() throws {
         try addProvider(FluentProvider.Provider.self)
         try addProvider(AuthProvider.Provider.self)
         try addProvider(StalkrCloud.Provider.self)
+    }
+    
+    private func setupMiddlwares() throws {
+        
+        addConfigurable(middleware: CORSMiddleware(), name: "cors")
+        
     }
 }
