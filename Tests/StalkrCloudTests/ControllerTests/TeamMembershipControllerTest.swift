@@ -63,8 +63,8 @@ class TeamMembershipControllerTest: ControllerTest {
         
         _ = try drop.respond(to: req)
         
-        let membership = try TeamMembership.first(with: (TeamMembership.Keys.teamId, teamid),
-                                                        (TeamMembership.Keys.userId, userid))
+        let membership = try TeamMembership.first(with: (TeamMembership.Keys.teamId, .equals, teamid),
+                                                        (TeamMembership.Keys.userId, .equals, userid))
         
         XCTAssertNotNil(membership, "membership not created")
     }

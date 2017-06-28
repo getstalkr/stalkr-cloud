@@ -12,8 +12,8 @@ import Foundation
 
 enum EntityAssertError: Error {
     case notFoundForId(e: Entity.Type, id: NodeRepresentable)
-    case notFoundWithFilters(e: Entity.Type, filters: [QueryFilter])
-    case foundWithFilters(e: Entity.Type, filters: [QueryFilter])
+    case notFoundWithFilters(e: Entity.Type, filters: [MoreFilter])
+    case foundWithFilters(e: Entity.Type, filters: [MoreFilter])
 }
 
 extension EntityAssertError: Debuggable {
@@ -58,7 +58,7 @@ extension Entity {
         throw EntityAssertError.notFoundForId(e: self, id: id)
     }
     
-    public static func assertFirst(with filters: [QueryFilter]) throws -> Self {
+    public static func assertFirst(with filters: [MoreFilter]) throws -> Self {
         if let e = try Self.first(with: filters) {
             return e
         }
@@ -66,17 +66,17 @@ extension Entity {
         throw EntityAssertError.notFoundWithFilters(e: self, filters: filters)
     }
     
-    public static func assertFirst(with filters: QueryFilter...) throws -> Self {
+    public static func assertFirst(with filters: MoreFilter...) throws -> Self {
         return try assertFirst(with: filters)
     }
     
-    public static func assertNoFirst(with filters: [QueryFilter]) throws {
+    public static func assertNoFirst(with filters: [MoreFilter]) throws {
         if try Self.first(with: filters) != nil {
             throw EntityAssertError.foundWithFilters(e: self, filters: filters)
         }
     }
     
-    public static func assertNoFirst(with filters: QueryFilter...) throws {
+    public static func assertNoFirst(with filters: MoreFilter...) throws {
         try assertNoFirst(with: filters)
     }
 }

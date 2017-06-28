@@ -80,8 +80,8 @@ class UserTest: XCTestCase {
             $0.userId = user.id
         }?.save()
         
-        let assignment = try RoleAssignment.first(with: (RoleAssignment.Keys.userId, user.id),
-                                                        (RoleAssignment.Keys.roleId, role.id))
+        let assignment = try RoleAssignment.first(with: (RoleAssignment.Keys.userId, .equals, user.id),
+                                                        (RoleAssignment.Keys.roleId, .equals, role.id))
         
         XCTAssertNotNil(assignment, "role_assignment not saved")
     }

@@ -32,7 +32,7 @@ final class User: Model {
             for _ in (0..<maxAttempts) {
                 let secret = makeSecret()
                     
-                if try User.first(with: (Keys.shortTokenSecret, secret)) == nil {
+                if try User.first(with: (Keys.shortTokenSecret, .equals, secret)) == nil {
                     return ShortToken(secret: secret, expiration: makeExpiration())
                 }
             }
@@ -147,8 +147,8 @@ extension User: PasswordAuthenticatable {
         let name = password.username
         let pass = password.password
         
-        if let user = try User.first(with: [(Keys.username, name),
-                                            (Keys.password, pass)]) {
+        if let user = try User.first(with: [(Keys.username, .equals, name),
+                                            (Keys.password, .equals, pass)]) {
             return user
         }
         

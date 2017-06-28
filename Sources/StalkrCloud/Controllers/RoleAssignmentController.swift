@@ -42,7 +42,7 @@ class RoleAssignmentController {
         let id = try request.assertHeaderValue(forKey: "id")
         let user = try User.assertFind(id)
             
-        let assignments = try RoleAssignment.all(with: (RoleAssignment.Keys.userId, user.id))
+        let assignments = try RoleAssignment.all(with: (RoleAssignment.Keys.userId, .equals, user.id))
             
         return try assignments.makeJSON()
     }
@@ -51,7 +51,7 @@ class RoleAssignmentController {
         let id = try request.assertHeaderValue(forKey: "id")
         let role = try Role.assertFind(id)
         
-        let assignments = try RoleAssignment.all(with: (RoleAssignment.Keys.roleId, role.id))
+        let assignments = try RoleAssignment.all(with: (RoleAssignment.Keys.roleId, .equals, role.id))
         
         return try assignments.makeJSON()
     }

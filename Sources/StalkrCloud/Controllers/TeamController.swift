@@ -31,7 +31,7 @@ class TeamController {
         
         let name = try request.assertHeaderValue(forKey: "name")
         
-        try Team.assertNoFirst(with: (Team.Keys.name, name))
+        try Team.assertNoFirst(with: (Team.Keys.name, .equals, name))
         
         let team = Team(name: name)
         try team.save()

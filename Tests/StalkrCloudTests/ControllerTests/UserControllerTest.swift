@@ -33,7 +33,7 @@ class UserControllerTest: ControllerTest {
         
         _ = try drop.respond(to: req)
         
-        let user = try User.first(with: [("username", username)])
+        let user = try User.first(with: ("username", .equals, username))
         
         XCTAssertNotNil(user, "user not registered")
     }

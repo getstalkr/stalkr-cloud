@@ -46,7 +46,7 @@ class TeamControllerTest: ControllerTest {
 
         _ = try drop.respond(to: req)
         
-        let team = try Team.first(with: [("name", name)])
+        let team = try Team.first(with: ("name", .equals, name))
         
         XCTAssertNotNil(team, "team not created")
     }
@@ -60,7 +60,7 @@ class TeamControllerTest: ControllerTest {
         
         _ = try drop.respond(to: req)
         
-        let team = try Team.first(with: [("name", name)])
+        let team = try Team.first(with: ("name", .equals, name))
         
         XCTAssertNil(team, "team created without access token")
     }

@@ -41,7 +41,7 @@ final class Role: Model {
     }
     
     class func withName(_ name: String) throws -> Role? {
-        return try Role.first(with: (Keys.name, name))
+        return try Role.first(with: (Keys.name, .equals, name))
     }
 }
 

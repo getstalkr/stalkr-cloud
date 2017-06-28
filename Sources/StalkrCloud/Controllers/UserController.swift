@@ -24,6 +24,7 @@ class UserController {
         drop.group("user") {
             $0.post("register", handler: register)
             $0.post("login", handler: login)
+            $0.post("shorttoken", "login", handler: shortTokenLogin)
             
             let authed = $0.grouped([TokenAuthenticationMiddleware(User.self)])
             
@@ -35,8 +36,7 @@ class UserController {
     func register(request: Request) throws -> ResponseRepresentable {
         let auth = try request.assertBasicAuth()
         
-        try User.assertNoFirst(with: (User.Keys.username,
-                                      auth.username))
+        try User.assertNoFirst(with: (User.Keys.username, .equals, auth.username))
         
         let user = User(name: auth.username,
                         password: try auth.password.hashed(by: drop))
@@ -55,6 +55,19 @@ class UserController {
                                   password: hashedPassword)
         
         let user = try User.authenticate(hashedAuth)
+        
+        let token = try UserToken.generate(for: user)
+        
+        try token.save()
+        
+        return token
+    }
+    
+    func shortTokenLogin(request: Request) throws -> ResponseRepresentable {
+        let secret = try request.assertHeaderValue(forKey: "secret")
+        
+        let user = try User.assertFirst(with: (User.Keys.shortTokenSecret, .equals, secret),
+                                              (User.Keys.shortTokenExpiration, .greaterThan, Date()))
         
         let token = try UserToken.generate(for: user)
         

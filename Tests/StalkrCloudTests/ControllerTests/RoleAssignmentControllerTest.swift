@@ -39,8 +39,8 @@ class RoleAssignmentControllerTest: ControllerTest {
         
         _ = try drop.respond(to: req)
         
-        let assignment = try RoleAssignment.first(with: (RoleAssignment.Keys.roleId, role?.id),
-                                                        (RoleAssignment.Keys.userId, user.id))
+        let assignment = try RoleAssignment.first(with: (RoleAssignment.Keys.roleId, .equals, role?.id),
+                                                        (RoleAssignment.Keys.userId, .equals, user.id))
         
         XCTAssertNotNil(assignment, "assignment not created")
     }
