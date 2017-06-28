@@ -28,6 +28,7 @@ class UserController {
             let authed = $0.grouped([TokenAuthenticationMiddleware(User.self)])
             
             authed.get("me", handler: me)
+            authed.get("shorttoken", handler: shortToken)
         }
     }
     
@@ -64,5 +65,15 @@ class UserController {
     
     func me(request: Request) throws -> ResponseRepresentable {
         return try request.user()
+    }
+    
+    func shortToken(request: Request) throws -> ResponseRepresentable {
+        let user = try request.user()
+        
+        user.shortToken = try User.ShortToken.makeUnique()
+        
+        try user.save()
+        
+        return user.shortToken!
     }
 }

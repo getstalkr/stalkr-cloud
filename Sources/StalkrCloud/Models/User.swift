@@ -13,6 +13,48 @@ import FluentProvider
 import Foundation
 
 final class User: Model {
+    struct ShortToken: JSONRepresentable, ResponseRepresentable {
+        
+        static let length = 6
+        static let lifeTime = 600.0
+        
+        static func makeSecret() -> String {
+            return String.random(length: length).uppercased()
+        }
+        
+        static func makeExpiration() -> Date {
+            return Date() + ShortToken.lifeTime
+        }
+        
+        static func makeUnique() throws -> ShortToken {
+            let maxAttempts = 30
+                
+            for _ in (0..<maxAttempts) {
+                let secret = makeSecret()
+                    
+                if try User.first(with: (Keys.shortTokenSecret, secret)) == nil {
+                    return ShortToken(secret: secret, expiration: makeExpiration())
+                }
+            }
+            
+            throw Abort.serverError
+        }
+        
+        var secret: String
+        var expiration: Date
+        
+        init(secret: String, expiration: Date) {
+            self.secret = secret
+            self.expiration = expiration
+        }
+        
+        func makeJSON() throws -> JSON {
+            var json = JSON()
+            try json.set("secret", secret)
+            try json.set("expiration", expiration)
+            return json
+        }
+    }
 
     let storage = Storage()
     
@@ -20,25 +62,36 @@ final class User: Model {
         static let id = User.idKey
         static let username = "username"
         static let password = "password"
+        static let shortTokenSecret = "short_token_secret"
+        static let shortTokenExpiration = "short_token_expiration"
     }
     
     var username: String
     var password: String
     
+    var shortToken: ShortToken?
+    
     public init(name: String, password: String) {
         self.username = name
         self.password = password
+        
+        self.shortToken = nil
     }
     
     required init(row: Row) throws {
         username = try row.get(Keys.username)
         password = try row.get(Keys.password)
+        
+        shortToken?.secret = try row.get(Keys.shortTokenSecret)
+        shortToken?.expiration = try row.get(Keys.shortTokenExpiration)
     }
     
     func makeRow() throws -> Row {
         var row = Row()
         try row.set(Keys.username, username)
         try row.set(Keys.password, password)
+        try row.set(Keys.shortTokenSecret, shortToken?.secret)
+        try row.set(Keys.shortTokenExpiration, shortToken?.expiration)
         return row
     }
 }
@@ -53,6 +106,8 @@ extension User: Preparation {
             c.string(Keys.username, length: nil,
                      optional: false, unique: true, default: nil)
             c.string(Keys.password)
+            c.string(Keys.shortTokenSecret, length: ShortToken.length, optional: true, unique: true, default: nil)
+            c.date(Keys.shortTokenExpiration, optional: true, unique: false, default: nil)
         }
     }
     
