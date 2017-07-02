@@ -19,7 +19,7 @@ final class User: Model {
         static let lifeTime = 600.0
         
         static func makeSecret() -> String {
-            return String.random(length: length, options: [.uppercase, .numbers])
+            return String.random(length: length, options: .numbers)
         }
         
         static func makeExpiration() -> Date {
