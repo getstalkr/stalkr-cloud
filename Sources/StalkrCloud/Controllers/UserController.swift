@@ -9,6 +9,7 @@
 import HTTP
 import Vapor
 import Foundation
+import Fluent
 import MoreFluent
 import AuthProvider
 
@@ -30,6 +31,9 @@ class UserController {
             
             authed.get("me", handler: me)
             authed.get("shorttoken", handler: shortToken)
+            
+            authed.post("dashboard", "new", handler: dashboardNew)
+            authed.get("dashboards", handler: dashboards)
         }
     }
     
@@ -88,5 +92,30 @@ class UserController {
         try user.save()
         
         return user.shortToken!
+    }
+    
+    func dashboards(request: Request) throws -> ResponseRepresentable {
+        let user = try request.user()
+        
+        let dashboards: Siblings<User, Dashboard, DashboardViewership> = user.siblings()
+        
+        return try "[\(dashboards.all().map { $0.configuration }.joined(separator: ","))]"
+    }
+    
+    func dashboardNew(request: Request) throws -> ResponseRepresentable {
+        let user = try request.user()
+        let name = try request.assertHeaderValue(forKey: "name")
+        
+        let configuration = try request.assertBody()
+        
+        let dashboard = Dashboard(name: name, configuration: configuration)
+        
+        try dashboard.save()
+        
+        let viewership = DashboardViewership(dashboardId: dashboard.id!, userId: user.id!)
+        
+        try viewership.save()
+        
+        return viewership
     }
 }

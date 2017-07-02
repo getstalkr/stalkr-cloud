@@ -24,6 +24,8 @@ public class Provider: Vapor.Provider {
         config.preparations.append(TeamMembership.self)
         config.preparations.append(Role.self)
         config.preparations.append(RoleAssignment.self)
+        config.preparations.append(Dashboard.self)
+        config.preparations.append(DashboardViewership.self)
     }
 
     /// This should be the name of the actual repository

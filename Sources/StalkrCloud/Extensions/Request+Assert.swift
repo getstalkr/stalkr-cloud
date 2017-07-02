@@ -15,6 +15,7 @@ import AuthProvider
 
 enum RequestAssertError: Error {
     case noValueForHeaderKey(String)
+    case noBody
 }
 
 extension RequestAssertError: Debuggable {
@@ -22,6 +23,8 @@ extension RequestAssertError: Debuggable {
         switch self {
         case .noValueForHeaderKey(_):
             return "noValueForHeaderKey"
+        case .noBody:
+            return "noBody"
         }
     }
     
@@ -29,6 +32,8 @@ extension RequestAssertError: Debuggable {
         switch self {
         case .noValueForHeaderKey(let key):
             return "no value found for header key \(key)"
+        case .noBody:
+            return "body not found"
         }
     }
     
@@ -55,5 +60,13 @@ extension Request {
         }
         
         throw RequestAssertError.noValueForHeaderKey(key)
+    }
+    
+    func assertBody() throws -> String {
+        if let value = self.body.bytes?.makeString() {
+            return value
+        }
+        
+        throw RequestAssertError.noBody
     }
 }
