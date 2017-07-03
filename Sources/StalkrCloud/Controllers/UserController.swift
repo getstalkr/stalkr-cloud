@@ -104,11 +104,10 @@ class UserController {
     
     func dashboardNew(request: Request) throws -> ResponseRepresentable {
         let user = try request.user()
-        let name = try request.assertHeaderValue(forKey: "name")
         
         let configuration = try request.assertBody()
         
-        let dashboard = Dashboard(name: name, configuration: configuration)
+        let dashboard = Dashboard(name: "dashboard", configuration: configuration)
         
         try dashboard.save()
         
