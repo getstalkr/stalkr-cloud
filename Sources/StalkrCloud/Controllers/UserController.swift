@@ -33,6 +33,7 @@ class UserController {
             authed.get("shorttoken", handler: shortToken)
             
             authed.post("dashboard", "new", handler: dashboardNew)
+            authed.post("dashboard", "delete", handler: dashboardDelete)
             authed.get("dashboards", handler: dashboards)
         }
     }
@@ -116,5 +117,23 @@ class UserController {
         try viewership.save()
         
         return viewership
+    }
+    
+    func dashboardDelete(request: Request) throws -> ResponseRepresentable {
+        let user = try request.user()
+        
+        let id = try request.assertJSONIntValue(forKey: "id")
+        
+        let viewerships = try DashboardViewership.all(with:
+            (DashboardViewership.Keys.userId, .equals, user.id!))
+        
+        let viewership: DashboardViewership? =
+            id < viewerships.count ? viewerships[id] : nil
+        
+        let dashboard = viewership?.dashboard
+        try viewership?.delete()
+        try dashboard?.delete()
+        
+        return "{\"success\": true}"
     }
 }
