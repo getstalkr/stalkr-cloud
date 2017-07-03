@@ -13,8 +13,21 @@ import FluentProvider
 import Foundation
 import AuthProvider
 
-enum RequestAssertError: Error {
+enum RequestAssertError: AbortError {
     case noValueForHeaderKey(String)
+    case noBasicAuth
+    case noBearerAuth
+    
+    public var status: Status {
+        switch self {
+        case .noValueForHeaderKey(_):
+            return .badRequest
+        case .noBasicAuth:
+            return .unauthorized
+        case .noBearerAuth:
+            return .unauthorized
+        }
+    }
 }
 
 extension RequestAssertError: Debuggable {
@@ -22,6 +35,10 @@ extension RequestAssertError: Debuggable {
         switch self {
         case .noValueForHeaderKey(_):
             return "noValueForHeaderKey"
+        case .noBasicAuth:
+            return "noBasicAuth"
+        case .noBearerAuth:
+            return "noBearerAuth"
         }
     }
     
@@ -29,6 +46,10 @@ extension RequestAssertError: Debuggable {
         switch self {
         case .noValueForHeaderKey(let key):
             return "no value found for header key \(key)"
+        case .noBasicAuth:
+            return "missing basic authentication header"
+        case .noBearerAuth:
+            return "missing bearer authentication header"
         }
     }
     
@@ -55,5 +76,21 @@ extension Request {
         }
         
         throw RequestAssertError.noValueForHeaderKey(key)
+    }
+    
+    func assertBasicAuth() throws -> Password {
+        if let auth = auth.header?.basic {
+            return auth
+        }
+        
+        throw Abort(Status.badRequest, metadata: "missing basic authorization header".makeNode(in: nil))
+    }
+    
+    func assertBearerAuth() throws -> Token {
+        if let auth = auth.header?.bearer {
+            return auth
+        }
+        
+        throw Abort(Status.badRequest, metadata: "missing bearer token".makeNode(in: nil))
     }
 }

@@ -9,11 +9,24 @@
 import Fluent
 import MoreFluent
 import Foundation
+import HTTP
+import Vapor
 
-enum EntityAssertError: Error {
+enum EntityAssertError: AbortError {
     case notFoundForId(e: Entity.Type, id: NodeRepresentable)
     case notFoundWithFilters(e: Entity.Type, filters: [MoreFilter])
     case foundWithFilters(e: Entity.Type, filters: [MoreFilter])
+    
+    public var status: Status {
+        switch self {
+        case .notFoundForId(_, _):
+            return .notFound
+        case .notFoundWithFilters(_,_):
+            return .notFound
+        case .foundWithFilters(_, _):
+            return .conflict
+        }
+    }
 }
 
 extension EntityAssertError: Debuggable {

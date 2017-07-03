@@ -34,21 +34,21 @@ class RoleAssignmentController {
         }
     }
     
-    func all(request: Request) throws -> ResponseRepresentable {
+    func all(req: Request) throws -> ResponseRepresentable {
         return try RoleAssignment.all().makeJSON()
     }
     
-    func user(request: Request) throws -> ResponseRepresentable {
-        let id = try request.assertHeaderValue(forKey: "id")
+    func user(req: Request) throws -> ResponseRepresentable {
+        let id = req.json?["id"]?.int
         let user = try User.assertFind(id)
-            
+        
         let assignments = try RoleAssignment.all(with: (RoleAssignment.Keys.userId, .equals, user.id))
             
         return try assignments.makeJSON()
     }
     
-    func role(request: Request) throws -> ResponseRepresentable {
-        let id = try request.assertHeaderValue(forKey: "id")
+    func role(req: Request) throws -> ResponseRepresentable {
+        let id = try req.assertHeaderValue(forKey: "id")
         let role = try Role.assertFind(id)
         
         let assignments = try RoleAssignment.all(with: (RoleAssignment.Keys.roleId, .equals, role.id))
@@ -56,10 +56,10 @@ class RoleAssignmentController {
         return try assignments.makeJSON()
     }
     
-    func create(request: Request) throws -> ResponseRepresentable {
-        let userid = try request.assertHeaderValue(forKey: "user_id")
+    func create(req: Request) throws -> ResponseRepresentable {
+        let userid = try req.assertHeaderValue(forKey: "user_id")
         let user = try User.assertFind(userid)
-        let roleid = try request.assertHeaderValue(forKey: "role_id")
+        let roleid = try req.assertHeaderValue(forKey: "role_id")
         let role = try Role.assertFind(roleid)
         
         let assignment = RoleAssignmentBuilder.build {
