@@ -14,8 +14,6 @@ XCTMain([
     testCase(UserControllerTest.allTests),
     testCase(TeamControllerTest.allTests),
     testCase(TeamMembershipControllerTest.allTests),
-    testCase(RoleControllerTest.allTests),
-    testCase(RoleAssignmentControllerTest.allTests),
     testCase(UserTest.allTests),
     testCase(TeamTest.allTests)
     ])

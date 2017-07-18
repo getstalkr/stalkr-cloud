@@ -90,29 +90,3 @@ final class TeamMembershipBuilder: Builder {
         return nil
     }
 }
-
-final class RoleBuilder: Builder {
-    typealias T = Role
-    
-    var name: String = "anyName"
-    var readableName: String = "anyReadableName"
-    
-    func finish() -> Role {
-        return Role(name: name, readableName: readableName)
-    }
-}
-
-final class RoleAssignmentBuilder: Builder {
-    typealias T = RoleAssignment?
-    
-    var userId: Identifier?
-    var roleId: Identifier?
-    
-    func finish() -> RoleAssignment? {
-        if let userId = userId, let roleId = roleId {
-            return RoleAssignment(roleId: roleId, userId: userId)
-        }
-        
-        return nil
-    }
-}

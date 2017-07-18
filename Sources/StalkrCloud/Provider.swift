@@ -22,8 +22,8 @@ public class Provider: Vapor.Provider {
         config.preparations.append(UserToken.self)
         config.preparations.append(Team.self)
         config.preparations.append(TeamMembership.self)
-        config.preparations.append(Role.self)
-        config.preparations.append(RoleAssignment.self)
+        //config.preparations.append(Role.self)
+        //config.preparations.append(RoleAssignment.self)
     }
 
     /// This should be the name of the actual repository
@@ -54,34 +54,18 @@ public class Provider: Vapor.Provider {
             let admin = User(name: "admin", password: "123456")
             
             try admin.save()
-            
-            let adminRoleId = try Role.withName("admin")?.id
-            try RoleAssignmentBuilder().build {
-                $0.roleId = adminRoleId
-                $0.userId = admin.id
-            }?.save()
-            
-            let userRoleId = try Role.withName("user")?.id
-            try RoleAssignmentBuilder().build {
-                $0.roleId = userRoleId
-                $0.userId = admin.id
-            }?.save()
         }
         
         // Init Controllers
         let userController = UserController(drop: drop)
         let teamController = TeamController(drop: drop)
-        let roleController = RoleController(drop: drop)
         
         let teamMembershipController = TeamMembershipController(drop: drop)
-        let roleAssignmentController = RoleAssignmentController(drop: drop)
 
         // Add Routes
         userController.addRoutes()
         teamController.addRoutes()
-        roleController.addRoutes()
         
         teamMembershipController.addRoutes()
-        roleAssignmentController.addRoutes()
     }
 }

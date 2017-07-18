@@ -12,24 +12,21 @@ import Vapor
 import Fluent
 import Foundation
 
-class RoleMiddleware: Middleware {
+protocol RolesMiddleware: Middleware {
+    associatedtype RolesType: Roles
     
-    static var admin: RoleMiddleware = RoleMiddleware(roleNames: ["admin"])
-    static var user: RoleMiddleware = RoleMiddleware(roleNames: ["user"])
+    var roles: RolesType { get set }
     
-    let roleNames: Set<String>
+    func roles(for: Request) -> RolesType
     
-    init(roleNames: Set<String>) {
-        self.roleNames = roleNames
-    }
-    
+    init(roles: RolesType)
+}
+
+extension RolesMiddleware {
     func respond(to request: Request, chainingTo next: Responder) throws -> Response {
+        let roles = self.roles(for: request)
         
-        let user = try request.user()
-        
-        let assignments = try user.roleAssignments.all()
-        
-        guard roleNames.isSubset(of: try assignments.map { try $0.role.get()! }.map { $0.name }) else {
+        if !self.roles.isSubset(of: roles) {
             throw Abort(Status.unauthorized, metadata: "unauthorized")
         }
         

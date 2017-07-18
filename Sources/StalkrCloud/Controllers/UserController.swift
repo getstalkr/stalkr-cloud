@@ -12,6 +12,46 @@ import Foundation
 import MoreFluent
 import AuthProvider
 
+extension UserController: ResourceRepresentable {
+    /// [GET] @ /users
+    /// Returns all users, optionally filtered by the request data.
+    func index(_ req: Request) throws -> ResponseRepresentable {
+        return try User.all().makeJSON()
+    }
+    
+    /// [GET] @ /users/:id
+    /// Returns the user with the ID supplied in the path
+    func show(_ req: Request, _ user: User) throws -> ResponseRepresentable {
+        return user
+    }
+    
+    /// [POST] @ /users
+    /// Creates a new user from the request's Basic Authorization Header.
+    /// -------------------------------------------------------------------
+    /// Headers: Basic Authorization
+    func store(_ req: Request) throws -> ResponseRepresentable {
+        let basic = try req.assertBasicAuth()
+        let username = basic.username
+        let password = try basic.password.hashed(by: drop)
+        
+        try User.assertNoFirst(with: ("username", .equals, username))
+        
+        let newUser = User(name: username, password: password)
+        
+        try newUser.save()
+        
+        return newUser
+    }
+    
+    func makeResource() -> Resource<User> {
+        return Resource(
+            index: index,
+            store: store,
+            show: show
+        )
+    }
+}
+
 final class UserController {
     
     let drop: Droplet
@@ -21,6 +61,9 @@ final class UserController {
     }
     
     func addRoutes() {
+        
+        drop.resource("users", self)
+        
         let route = drop.grouped("user")
         
         let authed = route.grouped(

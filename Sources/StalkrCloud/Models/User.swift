@@ -19,16 +19,20 @@ final class User: Model {
     var username: String
     var password: String
     
+    var roles: UserRoles
+    
     var shortToken = ShortToken()
     
-    public init(name: String, password: String) {
+    public init(name: String, password: String, roles: UserRoles = .user) {
         self.username = name
         self.password = password
+        self.roles = roles
     }
     
     required init(row: Row) throws {
         username = try row.get("username")
         password = try row.get("password")
+        roles = UserRoles(rawValue: try row.get("roles"))
         
         shortToken.secret = try row.get("short_token_secret")
         shortToken.expiration = try row.get("short_token_expiration")
@@ -38,6 +42,7 @@ final class User: Model {
         var row = Row()
         try row.set("username", username)
         try row.set("password", password)
+        try row.set("roles", roles.rawValue)
         try row.set("short_token_secret", shortToken.secret)
         try row.set("short_token_expiration", shortToken.expiration)
         return row
@@ -54,6 +59,7 @@ extension User: Preparation {
             c.string("username", length: nil,
                      optional: false, unique: true, default: nil)
             c.string("password")
+            c.int("roles")
             c.string("short_token_secret", length: ShortToken.length, optional: true, unique: true, default: nil)
             c.date("short_token_expiration", optional: true, unique: false, default: nil)
         }
@@ -62,6 +68,20 @@ extension User: Preparation {
     static func revert(_ database: Database) throws {
         try database.delete(self)
     }
+}
+
+// MARK: RoleAssignable
+
+struct UserRoles: Roles {
+    var rawValue: UInt
+    
+    static let user = UserRoles(index: 0)
+    static let admin = UserRoles(index: 1)
+    static let all: UserRoles = [.user, .admin]
+}
+
+extension User: RolesAssignable {
+    typealias RolesType = UserRoles
 }
 
 // MARK: TokenAuthenticable
@@ -132,6 +152,9 @@ extension User: JSONConvertible {
         }
         if keys.contains("password") {
             try json.set("password", password)
+        }
+        if keys.contains("roles") {
+            try json.set("roles", roles.rawValue)
         }
         if keys.contains("short_token_secret") {
             try json.set("short_token_secret", shortToken.secret)

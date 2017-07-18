@@ -19,6 +19,7 @@ enum RequestAssertError: AbortError {
     case noBearerAuth
     case noParameter(String)
     case parameterNotOfType(String, type: String)
+    case noJSON
     
     public var status: Status {
         switch self {
@@ -31,6 +32,8 @@ enum RequestAssertError: AbortError {
         case .noParameter(_):
             return .notFound
         case .parameterNotOfType(_, _):
+            return .badRequest
+        case .noJSON:
             return .badRequest
         }
     }
@@ -49,6 +52,8 @@ extension RequestAssertError: Debuggable {
             return "noParameter"
         case .parameterNotOfType(_, _):
             return "parameterNotOfType"
+        case .noJSON:
+            return "noJSON"
         }
     }
     
@@ -64,6 +69,8 @@ extension RequestAssertError: Debuggable {
             return "missing route parameter :\(p)"
         case .parameterNotOfType(let p, let type):
             return "route parameter :\(p) not of type \(type)"
+        case .noJSON:
+            return "no JSON or invalid"
         }
     }
     
@@ -108,6 +115,14 @@ extension Request {
         }
         
         throw Abort(Status.badRequest, metadata: "missing bearer token".makeNode(in: nil))
+    }
+    
+    func assertJSON() throws -> JSON {
+        if let json = self.json {
+            return json
+        }
+        
+        throw RequestAssertError.noJSON
     }
     
     fileprivate func _assertParameter(
