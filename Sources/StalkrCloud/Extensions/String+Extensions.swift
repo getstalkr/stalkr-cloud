@@ -9,7 +9,7 @@
 import Foundation
 import Vapor
 
-extension String {
+extension String {    
     func hashed(by drop: Droplet) throws -> String {
         return try drop.hash.make(self.makeBytes()).makeString()
     }

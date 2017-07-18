@@ -12,6 +12,7 @@ import XCTest
 
 import Foundation
 import Vapor
+import Authentication
 
 class TeamMembershipControllerTest: ControllerTest {
     
@@ -59,7 +60,7 @@ class TeamMembershipControllerTest: ControllerTest {
         let req = Request(method: .post, uri: "/teammembership/create/")
         req.headers["user_id"] = _userid.description
         req.headers["team_id"] = _teamid.description
-        req.setBearerAuth(token: adminToken.token)
+        req.auth.authenticate(admin)
         
         _ = try drop.respond(to: req)
         

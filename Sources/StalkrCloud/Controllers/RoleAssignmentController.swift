@@ -39,7 +39,7 @@ class RoleAssignmentController {
     }
     
     func user(req: Request) throws -> ResponseRepresentable {
-        let id = req.json?["id"]?.int
+        let id = try req.assertHeaderValue(forKey: "id")
         let user = try User.assertFind(id)
         
         let assignments = try RoleAssignment.all(with: (RoleAssignment.Keys.userId, .equals, user.id))

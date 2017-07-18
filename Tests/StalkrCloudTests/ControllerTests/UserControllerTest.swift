@@ -29,11 +29,15 @@ class UserControllerTest: ControllerTest {
         let password = "testUserRegister_password"
         
         let req = Request(method: .post, uri: "/user/register/")
-        req.setBasicAuth(username: username, password: password)
+        req.setAuthHeader(AuthorizationHeader(basic:
+            Password(username: username,
+                     password: password)))
         
-        _ = try drop.respond(to: req)
+        let res = try drop.respond(to: req)
         
-        let user = try User.first(with: ("username", .equals, username))
+        let hashed = try password.hashed(by: drop)
+        let user = try User.first(with: ("username", .equals, username),
+                                        ("password", .equals, hashed))
         
         XCTAssertNotNil(user, "user not registered")
     }
@@ -42,15 +46,17 @@ class UserControllerTest: ControllerTest {
         let prefix = "testUserLogin"
         
         let username = "\(prefix)_username"
-        let password = "\(prefix)_password"
-        
+        let password = try "\(prefix)_password"
         let hashedPassword = try password.hashed(by: drop)
         
         let user = User(name: username, password: hashedPassword)
         try user.save()
         
         let req = Request(method: .post, uri: "/user/login")
-        req.setBasicAuth(username: username, password: password)
+        
+        req.setAuthHeader(AuthorizationHeader(basic:
+            Password(username: username,
+                     password: password)))
         
         let res = try drop.respond(to: req)
 

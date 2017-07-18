@@ -12,7 +12,7 @@ import Foundation
 import MoreFluent
 import AuthProvider
 
-class UserController {
+final class UserController {
     
     let drop: Droplet
     
@@ -21,22 +21,24 @@ class UserController {
     }
     
     func addRoutes() {
-        drop.group("user") {
-            $0.post("register", handler: register)
-            $0.post("login", handler: login)
-            $0.post("shorttoken", "login", handler: shortTokenLogin)
+        let route = drop.grouped("user")
+        
+        let authed = route.grouped(
+            [TokenAuthenticationMiddleware(User.self)]
+        )
+    
+        route.post("register", handler: register)
+        route.post("login", handler: login)
+        route.post("shorttoken", "login", handler: shortTokenLogin)
             
-            let authed = $0.grouped([TokenAuthenticationMiddleware(User.self)])
-            
-            authed.get("me", handler: me)
-            authed.get("shorttoken", handler: shortToken)
-        }
+        authed.get("me", handler: me)
+        authed.get("shorttoken", handler: shortToken)
     }
     
     func register(request: Request) throws -> ResponseRepresentable {
         let auth = try request.assertBasicAuth()
         
-        try User.assertNoFirst(with: (User.Keys.username, .equals, auth.username))
+        try User.assertNoFirst(with: ("username", .equals, auth.username))
         
         let user = User(name: auth.username,
                         password: try auth.password.hashed(by: drop))
@@ -66,8 +68,9 @@ class UserController {
     func shortTokenLogin(request: Request) throws -> ResponseRepresentable {
         let secret = try request.assertHeaderValue(forKey: "secret")
         
-        let user = try User.assertFirst(with: (User.Keys.shortTokenSecret, .equals, secret),
-                                              (User.Keys.shortTokenExpiration, .greaterThan, Date()))
+        let user = try User.assertFirst(with:
+            ("short_token_secret", .equals, secret),
+            ("short_token_expiration", .greaterThan, Date()))
         
         let token = try UserToken.generate(for: user)
         
@@ -83,10 +86,10 @@ class UserController {
     func shortToken(request: Request) throws -> ResponseRepresentable {
         let user = try request.user()
         
-        user.shortToken = try User.ShortToken.makeUnique()
+        user.shortToken = try User.makeUniqueShortToken()
         
         try user.save()
         
-        return user.shortToken!
+        return user.shortToken
     }
 }

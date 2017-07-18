@@ -17,6 +17,8 @@ enum RequestAssertError: AbortError {
     case noValueForHeaderKey(String)
     case noBasicAuth
     case noBearerAuth
+    case noParameter(String)
+    case parameterNotOfType(String, type: String)
     
     public var status: Status {
         switch self {
@@ -26,6 +28,10 @@ enum RequestAssertError: AbortError {
             return .unauthorized
         case .noBearerAuth:
             return .unauthorized
+        case .noParameter(_):
+            return .notFound
+        case .parameterNotOfType(_, _):
+            return .badRequest
         }
     }
 }
@@ -39,6 +45,10 @@ extension RequestAssertError: Debuggable {
             return "noBasicAuth"
         case .noBearerAuth:
             return "noBearerAuth"
+        case .noParameter(_):
+            return "noParameter"
+        case .parameterNotOfType(_, _):
+            return "parameterNotOfType"
         }
     }
     
@@ -50,6 +60,10 @@ extension RequestAssertError: Debuggable {
             return "missing basic authentication header"
         case .noBearerAuth:
             return "missing bearer authentication header"
+        case .noParameter(let p):
+            return "missing route parameter :\(p)"
+        case .parameterNotOfType(let p, let type):
+            return "route parameter :\(p) not of type \(type)"
         }
     }
     
@@ -70,7 +84,9 @@ extension RequestAssertError: Debuggable {
 
 extension Request {
     
-    func assertHeaderValue(forKey key: String) throws -> String {
+    func assertHeaderValue(
+        forKey key: String
+        ) throws -> String {
         if let value = self.headers[HeaderKey(key)] {
             return value
         }
@@ -92,5 +108,41 @@ extension Request {
         }
         
         throw Abort(Status.badRequest, metadata: "missing bearer token".makeNode(in: nil))
+    }
+    
+    fileprivate func _assertParameter(
+        _ p: String
+        ) throws -> Parameters {
+        if let _p = self.parameters[p] {
+            return _p
+        }
+        
+        throw RequestAssertError.noParameter(p)
+    }
+    
+    func assertParameter(
+        _ p: String
+        ) throws -> Parameters {
+        return try _assertParameter(p)
+    }
+    
+    func assertParameter(
+        _ p: String
+        ) throws -> Int {
+        let _p = try _assertParameter(p)
+        if let v = _p.int {
+            return v
+        }
+        throw RequestAssertError.parameterNotOfType(p, type: "Int")
+    }
+    
+    func assertParameter(
+        _ p: String
+        ) throws -> String {
+        let _p = try _assertParameter(p)
+        if let v = _p.string {
+            return v
+        }
+        throw RequestAssertError.parameterNotOfType(p, type: "String")
     }
 }

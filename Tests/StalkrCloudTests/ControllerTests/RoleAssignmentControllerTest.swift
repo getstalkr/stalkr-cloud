@@ -12,6 +12,7 @@ import XCTest
 
 import Foundation
 import Vapor
+import Authentication
 
 class RoleAssignmentControllerTest: ControllerTest {
     
@@ -35,7 +36,7 @@ class RoleAssignmentControllerTest: ControllerTest {
         let req = Request(method: .post, uri: "/roleassignment/create/")
         req.headers["role_id"] = role?.id?.string
         req.headers["user_id"] = user.id?.string
-        req.setBearerAuth(token: adminToken.token)
+        req.auth.authenticate(admin)
         
         _ = try drop.respond(to: req)
         
