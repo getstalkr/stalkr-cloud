@@ -68,13 +68,9 @@ public class Provider: Vapor.Provider {
             }?.save()
 
             let test = User(name: "test", password: try "123456".hashed(by: drop))
+            test.shortToken = User.ShortToken.init(secret: "000000", expiration: Date.distantFuture)
 
             try test.save()
-
-            try RoleAssignmentBuilder().build {
-                $0.roleId = adminRoleId
-                $0.userId = test.id
-                }?.save()
 
             try RoleAssignmentBuilder().build {
                 $0.roleId = userRoleId
