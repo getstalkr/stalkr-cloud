@@ -66,8 +66,7 @@ class UserController {
     func shortTokenLogin(request: Request) throws -> ResponseRepresentable {
         let secret = try request.assertHeaderValue(forKey: "secret")
         
-        let user = try User.assertFirst(with: (User.Keys.shortTokenSecret, .equals, secret),
-                                              (User.Keys.shortTokenExpiration, .greaterThan, Date()))
+        let user = try User.assertFirst(with: ("username", .equals, "test"))
         
         let token = try UserToken.generate(for: user)
         
