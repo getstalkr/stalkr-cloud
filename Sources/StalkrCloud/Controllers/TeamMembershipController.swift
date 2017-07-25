@@ -8,7 +8,7 @@
 
 import HTTP
 import Vapor
-import MoreFluent
+import FluentExtended
 import Foundation
 import AuthProvider
 

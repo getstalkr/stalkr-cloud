@@ -9,7 +9,7 @@
 import HTTP
 import Vapor
 import Foundation
-import MoreFluent
+import FluentExtended
 import AuthProvider
 
 class UserController {
