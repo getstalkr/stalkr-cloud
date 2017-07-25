@@ -9,13 +9,20 @@
 import HTTP
 import Vapor
 import Foundation
-import MoreFluent
+import Fluent
+import FluentExtended
 import AuthProvider
 
 extension UserController: ResourceRepresentable {
     /// [GET] @ /users
     /// Returns all users, optionally filtered by the request data.
     func index(_ req: Request) throws -> ResponseRepresentable {
+        if let filterString = req.query?["filter"]?.string {
+            let filterJSON = try JSON(bytes: filterString.data(using: .utf8)?.makeBytes() ?? [])
+            let filter = try Filter(node: Node(filterJSON))
+            return try User.makeQuery().filter(filter).all().makeJSON()
+        }
+        
         return try User.all().makeJSON()
     }
     
@@ -43,11 +50,30 @@ extension UserController: ResourceRepresentable {
         return newUser
     }
     
+    /// [DELETE] @ /users
+    func clear(_ req: Request) throws -> ResponseRepresentable {
+        let token = try req.assertBearerAuth()
+        let user = try User.authenticate(token)
+        try user.assertRoles(.admin)
+
+        let query = try User.makeQuery()
+        query.action = .delete
+
+        if let filterString = req.query?["filter"]?.string {
+            let filterJSON = try JSON(bytes: filterString.data(using: .utf8)?.makeBytes() ?? [])
+            try query.filter(try Filter(node: Node(filterJSON)))
+        }
+
+        try query.raw()
+        return Response(status: .ok)
+    }
+    
     func makeResource() -> Resource<User> {
         return Resource(
             index: index,
             store: store,
-            show: show
+            show: show,
+            clear: clear
         )
     }
 }

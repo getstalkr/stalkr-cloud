@@ -12,8 +12,8 @@ import AuthProvider
 import FluentProvider
 import Foundation
 
-final class User: Model {
-    
+final class User: Model, SoftDeletable {
+
     let storage = Storage()
     
     var username: String
