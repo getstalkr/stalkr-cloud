@@ -33,12 +33,6 @@ class TeamControllerTest: ControllerTest {
         
         try user.save()
         
-        let role = try Role.withName("user")
-        try RoleAssignmentBuilder.build {
-            $0.roleId = role?.id
-            $0.userId = user.id
-        }?.save()
-        
         let req = Request(method: .post, uri: "/team/create/")
         
         req.auth.authenticate(user)

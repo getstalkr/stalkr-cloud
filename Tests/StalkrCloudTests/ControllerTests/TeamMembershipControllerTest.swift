@@ -32,12 +32,6 @@ class TeamMembershipControllerTest: ControllerTest {
         
         try user.save()
         
-        let role = try Role.withName("user")
-        try RoleAssignmentBuilder.build {
-            $0.roleId = role?.id
-            $0.userId = user.id
-        }?.save()
-        
         let team = TeamBuilder.build { $0.name = prefix + "name" }
         try team.save()
         

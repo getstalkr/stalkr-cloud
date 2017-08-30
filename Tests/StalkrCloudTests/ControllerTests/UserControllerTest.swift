@@ -27,8 +27,12 @@ class UserControllerTest: ControllerTest {
         
         let username = "testUserRegister_username"
         let password = "testUserRegister_password"
+        let email = "testUserRegister@email.com"
         
         let req = Request(method: .post, uri: "/user/register/")
+
+        req.json = JSON(try ["email": email].makeNode(in: nil))
+        print(req.json)
         req.setBasicAuth(username: username, password: password)
         
         _ = try drop.respond(to: req)
@@ -46,7 +50,11 @@ class UserControllerTest: ControllerTest {
         
         let hashedPassword = try password.hashed(by: drop)
         
-        let user = User(name: username, password: hashedPassword)
+        let user = UserBuilder.build {
+            $0.username = username
+            $0.password = hashedPassword
+        }
+        
         try user.save()
         
         let req = Request(method: .post, uri: "/user/login")

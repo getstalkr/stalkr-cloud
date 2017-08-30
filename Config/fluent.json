@@ -1,6 +1,6 @@
 {
     "driver": "memory",
-    "keyNamingConvention": "snake_case",
+    "keyNamingConvention": "camelCase",
     "migrationEntityName": "fluent",
     "pivotNameConnector": "_",
     "autoForeignKeys": true,

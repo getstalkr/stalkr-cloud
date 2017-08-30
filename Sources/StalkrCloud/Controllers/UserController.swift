@@ -39,11 +39,14 @@ extension UserController: ResourceRepresentable {
     func store(_ req: Request) throws -> ResponseRepresentable {
         let basic = try req.assertBasicAuth()
         let username = basic.username
+        let email: String = try req.assertJSONValue(forKey: "email")
         let password = try basic.password.hashed(by: drop)
 
         try User.assertNoFirst(with: ("username", .equals, username))
 
-        let newUser = User(name: username, password: password)
+        let newUser = User(username: username,
+                           email: email,
+                           password: password)
 
         try newUser.save()
 
@@ -104,21 +107,25 @@ final class UserController {
         authed.get("shorttoken", handler: shortToken)
     }
 
-    func register(request: Request) throws -> ResponseRepresentable {
-        let auth = try request.assertBasicAuth()
+    func register(req: Request) throws -> ResponseRepresentable {
+        let basic = try req.assertBasicAuth()
+        let username = basic.username
+        let email: String = try req.assertJSONValue(forKey: "email")
+        let password = try basic.password.hashed(by: drop)
 
-        try User.assertNoFirst(with: ("username", .equals, auth.username))
+        try User.assertNoFirst(with: ("username", .equals, username))
 
-        let user = User(name: auth.username,
-                        password: try auth.password.hashed(by: drop))
+        let newUser = User(username: username,
+                           email: email,
+                           password: password)
 
-        try user.save()
-
-        return user
+        try newUser.save()
+        
+        return newUser
     }
 
-    func login(request: Request) throws -> ResponseRepresentable {
-        let auth = try request.assertBasicAuth()
+    func login(req: Request) throws -> ResponseRepresentable {
+        let auth = try req.assertBasicAuth()
 
         let hashedPassword = try auth.password.hashed(by: drop)
 
@@ -134,12 +141,12 @@ final class UserController {
         return token
     }
 
-    func shortTokenLogin(request: Request) throws -> ResponseRepresentable {
-        let secret = try request.assertHeaderValue(forKey: "secret")
+    func shortTokenLogin(req: Request) throws -> ResponseRepresentable {
+        let secret = try req.assertHeaderValue(forKey: "secret")
 
         let user = try User.assertFirst(with:
             ("short_token_secret", .equals, secret),
-                                        ("short_token_expiration", .greaterThan, Date()))
+            ("short_token_expiration", .greaterThan, Date()))
 
         let token = try UserToken.generate(for: user)
 
@@ -148,12 +155,12 @@ final class UserController {
         return token
     }
 
-    func me(request: Request) throws -> ResponseRepresentable {
-        return try request.user()
+    func me(req: Request) throws -> ResponseRepresentable {
+        return try req.user()
     }
 
-    func shortToken(request: Request) throws -> ResponseRepresentable {
-        let user = try request.user()
+    func shortToken(req: Request) throws -> ResponseRepresentable {
+        let user = try req.user()
 
         user.shortToken = try User.makeUniqueShortToken()
 

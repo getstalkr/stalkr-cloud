@@ -56,10 +56,15 @@ final class UserBuilder: Builder {
     }
 
     var username: String = "anyUsername"
+    var email: String = "any@email.com"
     var password: String = "anyPassword"
+    var roles: UserRoles = .user
 
     func finish() -> User {
-        let user = User(name: username, password: password)
+        let user = User(username: username,
+                        email: email,
+                        password: password,
+                        roles: roles)
 
         return user
     }

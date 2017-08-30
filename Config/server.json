@@ -1,5 +1,5 @@
 {
-    "port": "$PORT:8080",
+    "port": "$PORT:4000",
     "host": "0.0.0.0",
     "securityLayer": "none"
 }

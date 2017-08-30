@@ -17,19 +17,25 @@ final class User: Model, SoftDeletable {
 
     var username: String
     var password: String
+    var email: String
 
     var roles: UserRoles
 
     var shortToken = ShortToken()
 
-    public init(name: String, password: String, roles: UserRoles = .user) {
-        self.username = name
+    public init(username: String,
+                email: String,
+                password: String,
+                roles: UserRoles = .user) {
+        self.username = username
+        self.email = email
         self.password = password
         self.roles = roles
     }
 
     required init(row: Row) throws {
         username = try row.get("username")
+        email = try row.get("email")
         password = try row.get("password")
         roles = UserRoles(rawValue: try row.get("roles"))
 
@@ -40,6 +46,7 @@ final class User: Model, SoftDeletable {
     func makeRow() throws -> Row {
         var row = Row()
         try row.set("username", username)
+        try row.set("email", email)
         try row.set("password", password)
         try row.set("roles", roles.rawValue)
         try row.set("short_token_secret", shortToken.secret)
@@ -56,6 +63,7 @@ extension User: Preparation {
             c.id()
             c.string("username", length: nil,
                      optional: false, unique: true, default: nil)
+            c.string("email")
             c.string("password")
             c.int("roles")
             c.string("short_token_secret", length: ShortToken.length, optional: true, unique: true, default: nil)
@@ -124,7 +132,8 @@ private var _userPasswordVerifier: PasswordVerifier? = nil
 extension User: JSONConvertible {
     convenience init(json: JSON) throws {
         try self.init(
-            name: json.get("username"),
+            username: json.get("username"),
+            email: json.get("email"),
             password: json.get("password")
         )
 
@@ -143,6 +152,9 @@ extension User: JSONConvertible {
         }
         if keys.contains("username") {
             try json.set("username", username)
+        }
+        if keys.contains("email") {
+            try json.set("email", email)
         }
         if keys.contains("password") {
             try json.set("password", password)

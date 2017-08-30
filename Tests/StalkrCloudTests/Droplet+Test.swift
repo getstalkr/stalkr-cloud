@@ -15,9 +15,7 @@ extension Droplet {
             let config = try Config()
             try config.setup()
             
-            let drop = try Droplet(config)
-            
-            return drop
+            return try Droplet(config)
         } catch {
             fatalError("could not instantiate shared drop")
         }

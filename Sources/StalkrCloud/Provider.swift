@@ -37,8 +37,7 @@ public class Provider: Vapor.Provider {
     public static let repositoryName: String = "stalkr-cloud"
 
     required public init(config: Config) throws {
-        print([1, 2].reduce("") { r, i in return r + i.description })
-        [1, 2].dropFirst()
+        
     }
 
     public func boot(_ drop: Droplet) throws {
@@ -49,11 +48,15 @@ public class Provider: Vapor.Provider {
     func setup(_ drop: Droplet) throws {
         // Preparations
         if let _ = drop.database {
-            let admin = User(name: "admin", password: try "123456".hashed(by: drop))
+            let admin = User(username: "admin",
+                             email: "admin@getstal.kr",
+                             password: try "123456".hashed(by: drop))
             admin.roles = [.user, .admin]
             try admin.save()
 
-            let test = User(name: "test", password: try "123456".hashed(by: drop))
+            let test = User(username: "test",
+                            email: "test@getstal.kr",
+                            password: try "123456".hashed(by: drop))
             test.roles = [.user]
             test.shortToken = ShortToken(secret: "123456", expiration: Date.distantFuture)
             try test.save()

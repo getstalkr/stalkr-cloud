@@ -57,12 +57,6 @@ class ControllerTest: XCTestCase {
             }
             try user.save()
             
-            let role = try Role.withName("user")
-            try RoleAssignmentBuilder.build {
-                $0.userId = user.id
-                $0.roleId = role?.id
-            }?.save()
-            
             return user
         }
         catch {
@@ -85,14 +79,9 @@ class ControllerTest: XCTestCase {
             let user = UserBuilder.build {
                 $0.username = "ControllerTest_Admin_Username"
                 $0.password = "ControllerTest_Admin_Password"
+                $0.roles = [.user, .admin]
             }
             try user.save()
-            
-            let role = try Role.withName("admin")
-            try RoleAssignmentBuilder.build {
-                $0.userId = user.id
-                $0.roleId = role?.id
-            }?.save()
             
             return user
         }
